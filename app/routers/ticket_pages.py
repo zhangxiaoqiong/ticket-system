@@ -21,8 +21,11 @@ def pretty_json(value) -> str:
 templates.env.filters["pretty_json"] = pretty_json
 
 
-def redirect_to_ticket_actions(ticket_no: str) -> RedirectResponse:
-    return RedirectResponse(url=f"/tickets/{ticket_no}#actions", status_code=302)
+def redirect_to_ticket_actions(request: Request, ticket_no: str) -> RedirectResponse:
+    return RedirectResponse(
+        url=str(request.url_for("ticket_detail", ticket_no=ticket_no)) + "#actions",
+        status_code=302,
+    )
 
 
 async def parse_form_data(request: Request) -> dict:
@@ -101,7 +104,7 @@ async def update_status_form(
     except ValueError as e:
         status_code = 404 if "不存在" in str(e) else 400
         raise HTTPException(status_code=status_code, detail=str(e))
-    return redirect_to_ticket_actions(ticket_no)
+    return redirect_to_ticket_actions(request, ticket_no)
 
 
 @router.post("/tickets/{ticket_no}/comment-form")
@@ -117,7 +120,7 @@ async def add_comment_form(
         operator_name=form.get("operator_name", ""),
         comment=form.get("comment", ""),
     )
-    return redirect_to_ticket_actions(ticket_no)
+    return redirect_to_ticket_actions(request, ticket_no)
 
 
 @router.post("/tickets/{ticket_no}/close-form")
@@ -133,4 +136,4 @@ async def close_ticket_form(
         operator_name=form.get("operator_name", ""),
         resolved_result=form.get("resolved_result", ""),
     )
-    return redirect_to_ticket_actions(ticket_no)
+    return redirect_to_ticket_actions(request, ticket_no)

@@ -12,8 +12,15 @@
         .header a:hover { opacity: 1; }
         .header h1 { font-size: 18px; font-weight: 600; }
         .container { max-width: 1000px; margin: 20px auto; padding: 0 20px; }
-        .section { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .section h2 { font-size: 16px; font-weight: 600; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #eee; color: #1a73e8; }
+        .section { --accent: #1a73e8; --soft: #f3f8ff; background: #fff; border-radius: 8px; padding: 18px 20px 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 5px solid var(--accent); }
+        .section h2 { font-size: 16px; font-weight: 600; margin: -6px -8px 16px; padding: 10px 12px; border-bottom: 1px solid #eef1f5; color: #1f2937; background: var(--soft); border-radius: 6px; }
+        .section-basic { --accent: #1a73e8; --soft: #eef5ff; }
+        .section-feedback { --accent: #0f766e; --soft: #edfafa; }
+        .section-diagnosis { --accent: #7c3aed; --soft: #f5f0ff; }
+        .section-json { --accent: #64748b; --soft: #f4f6f8; }
+        .section-action { --accent: #d97706; --soft: #fff7ed; }
+        .section-events { --accent: #2563eb; --soft: #eff6ff; }
+        .section-closed { --accent: #6b7280; --soft: #f5f5f5; }
         .field-row { display: flex; margin-bottom: 10px; font-size: 14px; }
         .field-label { width: 140px; color: #666; flex-shrink: 0; }
         .field-value { flex: 1; word-break: break-all; }
@@ -69,13 +76,13 @@
 </head>
 <body>
 <div class="header">
-    <a href="/tickets">&larr; 返回列表</a>
+    <a href="{{ request.url_for('ticket_list') }}">&larr; 返回列表</a>
     <h1>{{ ticket.ticket_no }}</h1>
 </div>
 <div class="container">
 
     <!-- 一、工单基础信息 -->
-    <div class="section">
+    <div class="section section-basic">
         <h2>一、工单基础信息</h2>
         <div class="field-row"><div class="field-label">工单号</div><div class="field-value">{{ ticket.ticket_no }}</div></div>
         <div class="field-row"><div class="field-label">状态</div><div class="field-value"><span class="status-badge status-{{ ticket.status }}">{{ ticket.status }}</span></div></div>
@@ -93,7 +100,7 @@
     </div>
 
     <!-- 二、用户反馈信息 -->
-    <div class="section">
+    <div class="section section-feedback">
         <h2>二、用户反馈信息</h2>
         <div class="field-row"><div class="field-label">用户账号</div><div class="field-value">{{ ticket.reporter_account or "-" }}</div></div>
         <div class="field-row"><div class="field-label">用户名称</div><div class="field-value">{{ ticket.reporter_name or "-" }}</div></div>
@@ -104,7 +111,7 @@
     </div>
 
     <!-- 三、智能体诊断结论 -->
-    <div class="section">
+    <div class="section section-diagnosis">
         <h2>三、智能体诊断结论</h2>
         <div class="field-row"><div class="field-label">诊断摘要</div><div class="field-value">{{ ticket.diagnosis_summary or "-" }}</div></div>
         <div class="field-row"><div class="field-label">内部建议</div><div class="field-value">{{ ticket.internal_suggestion or "-" }}</div></div>
@@ -113,7 +120,7 @@
 
     <!-- 四、诊断上下文 JSON -->
     {% if ticket.diagnosis_payload %}
-    <div class="section">
+    <div class="section section-json">
         <h2>四、诊断上下文 JSON</h2>
         <pre class="json-block">{{ ticket.diagnosis_payload | pretty_json }}</pre>
     </div>
@@ -121,7 +128,7 @@
 
     <!-- 操作区域 -->
     {% if ticket.status != "CLOSED" %}
-    <div id="actions" class="section">
+    <div id="actions" class="section section-action">
         <h2>操作</h2>
         <div class="operator-bar">
             <div class="operator-title">操作人信息</div>
@@ -138,7 +145,7 @@
         </div>
 
         <div>
-            <form class="action-box operator-aware-form" method="post" action="/tickets/{{ ticket.ticket_no }}/status-form" onsubmit="return confirmCloseStatus(this)">
+            <form class="action-box operator-aware-form" method="post" action="{{ request.url_for('update_status_form', ticket_no=ticket.ticket_no) }}" onsubmit="return confirmCloseStatus(this)">
                 <input type="hidden" name="operator_account">
                 <input type="hidden" name="operator_name">
                 <h3>更新状态</h3>
@@ -159,7 +166,7 @@
         </div>
     </div>
     {% else %}
-    <div id="actions" class="section" style="text-align:center;color:#999;">
+    <div id="actions" class="section section-closed" style="text-align:center;color:#999;">
         <p>工单已关闭</p>
         {% if ticket.resolved_result %}
         <div class="field-row" style="justify-content:center;margin-top:8px;">
@@ -171,7 +178,7 @@
     {% endif %}
 
     <!-- 五、处理记录 -->
-    <div class="section">
+    <div class="section section-events">
         <h2>五、处理记录</h2>
         {% if events %}
         <ul class="event-list">

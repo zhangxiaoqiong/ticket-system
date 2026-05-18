@@ -40,7 +40,7 @@
     <h1>顺心分单诊断工单系统</h1>
 </div>
 <div class="container">
-    <form class="filter-bar" method="get" action="/tickets">
+    <form class="filter-bar" method="get" action="{{ request.url_for('ticket_list') }}">
         <select name="status" onchange="this.form.submit()">
             <option value="">全部状态</option>
             <option value="NEW" {% if status=='NEW' %}selected{% endif %}>NEW 新建</option>
@@ -50,7 +50,7 @@
         </select>
         <input type="text" name="keyword" placeholder="工单号 / 地址 / 问题" value="{{ keyword }}" style="width: 260px;">
         <button type="submit">筛选</button>
-        <a class="reset" href="/tickets">重置</a>
+        <a class="reset" href="{{ request.url_for('ticket_list') }}">重置</a>
     </form>
 
     <div class="ticket-count">共 {{ tickets|length }} 条工单</div>
@@ -73,7 +73,7 @@
         <tbody>
             {% for t in tickets %}
             <tr>
-                <td><a class="ticket-link" href="/tickets/{{ t.ticket_no }}">{{ t.ticket_no }}</a></td>
+                <td><a class="ticket-link" href="{{ request.url_for('ticket_detail', ticket_no=t.ticket_no) }}">{{ t.ticket_no }}</a></td>
                 <td><span class="status-badge status-{{ t.status }}">{{ t.status }}</span></td>
                 <td><span class="priority-{{ t.priority }}">{{ t.priority }}</span></td>
                 <td>{{ t.issue_type or "-" }}</td>
@@ -81,7 +81,7 @@
                 <td class="address-cell" title="{{ t.full_address or '' }}">{{ t.full_address or "-" }}</td>
                 <td>{{ t.expected_result or "-" }}</td>
                 <td>{{ t.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                <td><a class="ticket-link" href="/tickets/{{ t.ticket_no }}">详情</a></td>
+                <td><a class="ticket-link" href="{{ request.url_for('ticket_detail', ticket_no=t.ticket_no) }}">详情</a></td>
             </tr>
             {% endfor %}
         </tbody>
