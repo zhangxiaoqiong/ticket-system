@@ -9,7 +9,6 @@ from app.schemas import CreateTicketRequest
 from app.services.id_generator import generate_ticket_no
 
 ALLOWED_STATUSES = {"NEW", "PROCESSING", "RESOLVED", "CLOSED"}
-EDITABLE_STATUSES = {"NEW", "PROCESSING", "RESOLVED"}
 
 
 def clean(value) -> str:
@@ -143,10 +142,8 @@ def update_ticket_status(
     old_status = ticket.status
     if old_status == "CLOSED":
         raise ValueError("工单已关闭，不能再更新状态")
-    if status == "CLOSED":
-        raise ValueError("请通过关闭工单操作关闭")
-    if status not in EDITABLE_STATUSES:
-        raise ValueError(f"非法状态：{status}")
+    if status == "CLOSED" and not clean(comment):
+        raise ValueError("关闭工单时请填写处理说明")
 
     ticket.status = status
     operator_display = clean(operator_name) or clean(operator_account)
@@ -155,6 +152,9 @@ def update_ticket_status(
 
     if status == "RESOLVED":
         ticket.resolved_at = datetime.utcnow()
+    elif status == "CLOSED":
+        ticket.closed_at = datetime.utcnow()
+        ticket.resolved_result = comment
     elif old_status == "RESOLVED":
         ticket.resolved_at = None
 
