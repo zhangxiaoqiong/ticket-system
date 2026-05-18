@@ -1,18 +1,7 @@
 from datetime import datetime
-from sqlalchemy.orm import Session
 
-from app.models import Ticket
+from sqlalchemy.orm import Session
 
 
 def generate_ticket_no(db: Session) -> str:
-    today = datetime.now().strftime("%Y%m%d")
-    prefix = f"ADDR{today}"
-
-    count = (
-        db.query(Ticket)
-        .filter(Ticket.ticket_no.like(f"{prefix}%"))
-        .count()
-    )
-
-    seq = count + 1
-    return f"{prefix}{seq:04d}"
+    return f"SX{datetime.now():%y%m%d%H%M%S}"

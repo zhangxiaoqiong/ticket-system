@@ -26,15 +26,20 @@
         .priority-P2 { color: #f57c00; font-weight: 700; }
         .priority-P3 { color: #616161; }
         .priority-P4 { color: #9e9e9e; }
-        textarea, input[type="text"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; resize: vertical; }
+        textarea, input[type="text"], select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; resize: vertical; }
+        textarea:focus, input[type="text"]:focus, select:focus { outline: none; border-color: #1a73e8; box-shadow: 0 0 0 3px rgba(26,115,232,0.12); }
         textarea { min-height: 80px; }
         .form-row { display: flex; gap: 12px; margin-bottom: 12px; }
+        .form-row > div { flex: 1; }
         .form-row label { font-size: 13px; color: #666; margin-bottom: 4px; display: block; }
         .form-row input, .form-row select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
         button { padding: 8px 20px; background: #1a73e8; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
         button:hover { background: #1557b0; }
         button.secondary { background: #666; }
         button.danger { background: #d32f2f; }
+        button.success { background: #2e7d32; }
+        button.success:hover { background: #1f5f24; }
+        button:disabled { background: #c8ccd2; cursor: not-allowed; }
         .event-list { list-style: none; }
         .event-item { padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
         .event-item:last-child { border-bottom: none; }
@@ -43,9 +48,23 @@
         .event-content { margin-top: 6px; font-size: 14px; white-space: pre-wrap; word-break: break-all; }
         .event-operator { color: #666; font-size: 12px; margin-top: 4px; }
         pre.json-block { background: #f5f7fa; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 12px; max-height: 400px; }
-        .action-bar { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-        .action-panel { display: none; margin-bottom: 16px; }
-        .action-panel.active { display: block; }
+        .operator-bar { background: #f8fafd; border: 1px solid #e4ebf5; border-radius: 8px; padding: 14px; margin-bottom: 16px; }
+        .operator-title { font-size: 13px; color: #555; margin-bottom: 10px; font-weight: 600; }
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+        .action-box { border: 1px solid #e6e8eb; border-radius: 8px; padding: 16px; background: #fff; min-height: 100%; }
+        .action-box h3 { font-size: 15px; margin-bottom: 6px; color: #222; }
+        .action-box .hint { color: #777; font-size: 12px; margin-bottom: 12px; line-height: 1.5; }
+        .action-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+        .close-box { margin-top: 16px; border-color: #f2c8c8; background: #fffafa; }
+        .close-box h3 { color: #b3261e; }
+        @media (max-width: 720px) {
+            .container { padding: 0 12px; }
+            .field-row, .form-row { display: block; }
+            .field-label { width: auto; margin-bottom: 4px; }
+            .form-row > div { margin-bottom: 10px; }
+            .action-grid { grid-template-columns: 1fr; }
+            button { width: 100%; margin-bottom: 8px; }
+        }
     </style>
 </head>
 <body>
@@ -96,7 +115,77 @@
     {% if ticket.diagnosis_payload %}
     <div class="section">
         <h2>四、诊断上下文 JSON</h2>
-        <pre class="json-block">{{ ticket.diagnosis_payload | tojson(indent=2) }}</pre>
+        <pre class="json-block">{{ ticket.diagnosis_payload | pretty_json }}</pre>
+    </div>
+    {% endif %}
+
+    <!-- 操作区域 -->
+    {% if ticket.status != "CLOSED" %}
+    <div id="actions" class="section">
+        <h2>操作</h2>
+        <div class="operator-bar">
+            <div class="operator-title">操作人信息</div>
+            <div class="form-row" style="margin-bottom:0;">
+                <div>
+                    <label>账号</label>
+                    <input id="operatorAccount" type="text" placeholder="选填">
+                </div>
+                <div>
+                    <label>名称</label>
+                    <input id="operatorName" type="text" placeholder="选填">
+                </div>
+            </div>
+        </div>
+
+        <div class="action-grid">
+            <form class="action-box operator-aware-form" method="post" action="/tickets/{{ ticket.ticket_no }}/status-form">
+                <input type="hidden" name="operator_account">
+                <input type="hidden" name="operator_name">
+                <h3>更新状态</h3>
+                <div class="hint">关闭前可按实际处理进展调整状态，也可以在当前状态下反复补充处理说明。</div>
+                <label>工单状态</label>
+                <select name="status">
+                    <option value="NEW" {% if ticket.status == "NEW" %}selected{% endif %}>NEW 新建</option>
+                    <option value="PROCESSING" {% if ticket.status == "PROCESSING" %}selected{% endif %}>PROCESSING 处理中</option>
+                    <option value="RESOLVED" {% if ticket.status == "RESOLVED" %}selected{% endif %}>RESOLVED 已解决</option>
+                </select>
+                <label>备注说明</label>
+                <textarea name="comment" placeholder="选填，例如：已联系网点核实"></textarea>
+                <div class="action-buttons">
+                    <button type="submit">保存状态</button>
+                </div>
+            </form>
+
+            <form class="action-box operator-aware-form" method="post" action="/tickets/{{ ticket.ticket_no }}/comment-form">
+                <input type="hidden" name="operator_account">
+                <input type="hidden" name="operator_name">
+                <h3>添加备注</h3>
+                <div class="hint">记录沟通、核查过程或临时说明，不改变工单状态。</div>
+                <label>备注内容</label>
+                <textarea name="comment" required placeholder="请输入备注内容"></textarea>
+                <button class="secondary" type="submit">提交备注</button>
+            </form>
+        </div>
+
+        <form class="action-box close-box operator-aware-form" method="post" action="/tickets/{{ ticket.ticket_no }}/close-form">
+            <input type="hidden" name="operator_account">
+            <input type="hidden" name="operator_name">
+            <h3>关闭工单</h3>
+            <div class="hint">关闭后工单不可继续操作，请填写明确的处理结论。</div>
+            <label>处理结论</label>
+            <textarea name="resolved_result" required placeholder="请输入处理结论"></textarea>
+            <button type="submit" class="danger" onclick="return confirm('确认关闭此工单？')">确认关闭</button>
+        </form>
+    </div>
+    {% else %}
+    <div id="actions" class="section" style="text-align:center;color:#999;">
+        <p>工单已关闭</p>
+        {% if ticket.resolved_result %}
+        <div class="field-row" style="justify-content:center;margin-top:8px;">
+            <div class="field-label">处理结论</div>
+            <div class="field-value" style="white-space:pre-wrap;">{{ ticket.resolved_result }}</div>
+        </div>
+        {% endif %}
     </div>
     {% endif %}
 
@@ -124,112 +213,24 @@
         {% endif %}
     </div>
 
-    <!-- 操作区域 -->
-    {% if ticket.status != "CLOSED" %}
-    <div class="section">
-        <h2>操作</h2>
-        <div class="action-bar">
-            <button onclick="togglePanel('statusPanel')">开始处理 / 更新状态</button>
-            <button class="secondary" onclick="togglePanel('commentPanel')">添加备注</button>
-            <button class="danger" onclick="togglePanel('closePanel')">关闭工单</button>
-        </div>
-
-        <div id="statusPanel" class="action-panel">
-            <form method="post" action="/tickets/{{ ticket.ticket_no }}/status-form">
-                <div class="form-row">
-                    <div>
-                        <label>状态</label>
-                        <select name="status">
-                            <option value="PROCESSING">PROCESSING 处理中</option>
-                            <option value="RESOLVED">RESOLVED 已解决</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label>操作人账号</label>
-                        <input type="text" name="operator_account" placeholder="选填">
-                    </div>
-                    <div>
-                        <label>操作人名称</label>
-                        <input type="text" name="operator_name" placeholder="选填">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div style="flex:1">
-                        <label>备注说明</label>
-                        <textarea name="comment" placeholder="选填"></textarea>
-                    </div>
-                </div>
-                <button type="submit">确认</button>
-                <button type="button" class="secondary" onclick="togglePanel('statusPanel')">取消</button>
-            </form>
-        </div>
-
-        <div id="commentPanel" class="action-panel">
-            <form method="post" action="/tickets/{{ ticket.ticket_no }}/comment-form">
-                <div class="form-row">
-                    <div>
-                        <label>操作人账号</label>
-                        <input type="text" name="operator_account" placeholder="选填">
-                    </div>
-                    <div>
-                        <label>操作人名称</label>
-                        <input type="text" name="operator_name" placeholder="选填">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div style="flex:1">
-                        <label>备注内容</label>
-                        <textarea name="comment" required placeholder="请输入备注内容"></textarea>
-                    </div>
-                </div>
-                <button type="submit">提交备注</button>
-                <button type="button" class="secondary" onclick="togglePanel('commentPanel')">取消</button>
-            </form>
-        </div>
-
-        <div id="closePanel" class="action-panel">
-            <form method="post" action="/tickets/{{ ticket.ticket_no }}/close-form">
-                <div class="form-row">
-                    <div>
-                        <label>操作人账号</label>
-                        <input type="text" name="operator_account" placeholder="选填">
-                    </div>
-                    <div>
-                        <label>操作人名称</label>
-                        <input type="text" name="operator_name" placeholder="选填">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div style="flex:1">
-                        <label>处理结论（必填）</label>
-                        <textarea name="resolved_result" required placeholder="请输入处理结论"></textarea>
-                    </div>
-                </div>
-                <button type="submit" class="danger" onclick="return confirm('确认关闭此工单？')">确认关闭</button>
-                <button type="button" class="secondary" onclick="togglePanel('closePanel')">取消</button>
-            </form>
-        </div>
-    </div>
-    {% else %}
-    <div class="section" style="text-align:center;color:#999;">
-        <p>工单已关闭</p>
-        {% if ticket.resolved_result %}
-        <div class="field-row" style="justify-content:center;margin-top:8px;">
-            <div class="field-label">处理结论</div>
-            <div class="field-value" style="white-space:pre-wrap;">{{ ticket.resolved_result }}</div>
-        </div>
-        {% endif %}
-    </div>
-    {% endif %}
-
 </div>
 
 <script>
-function togglePanel(id) {
-    document.querySelectorAll('.action-panel').forEach(p => {
-        if (p.id !== id) p.classList.remove('active');
+const operatorAccount = document.getElementById('operatorAccount');
+const operatorName = document.getElementById('operatorName');
+
+if (operatorAccount && operatorName) {
+    operatorAccount.value = localStorage.getItem('ticket_operator_account') || '';
+    operatorName.value = localStorage.getItem('ticket_operator_name') || '';
+
+    document.querySelectorAll('.operator-aware-form').forEach(form => {
+        form.addEventListener('submit', () => {
+            localStorage.setItem('ticket_operator_account', operatorAccount.value.trim());
+            localStorage.setItem('ticket_operator_name', operatorName.value.trim());
+            form.querySelector('input[name="operator_account"]').value = operatorAccount.value.trim();
+            form.querySelector('input[name="operator_name"]').value = operatorName.value.trim();
+        });
     });
-    document.getElementById(id).classList.toggle('active');
 }
 </script>
 </body>

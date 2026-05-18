@@ -1,9 +1,8 @@
 .env
 __pycache__/
-*.pyc
-*.pyo
-*.egg-info/
-dist/
-build/
+*.py[cod]
+.pytest_cache/
 .venv/
 venv/
+dist/
+build/

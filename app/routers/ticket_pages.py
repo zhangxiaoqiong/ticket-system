@@ -1,4 +1,7 @@
-from fastapi import APIRouter, Depends, Request, Form
+import json
+from urllib.parse import parse_qs
+
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
@@ -11,9 +14,21 @@ router = APIRouter(tags=["pages"])
 templates = Jinja2Templates(directory="app/templates")
 
 
+def pretty_json(value) -> str:
+    return json.dumps(value, ensure_ascii=False, indent=2, default=str)
+
+
+templates.env.filters["pretty_json"] = pretty_json
+
+
+def redirect_to_ticket_actions(ticket_no: str) -> RedirectResponse:
+    return RedirectResponse(url=f"/tickets/{ticket_no}#actions", status_code=302)
+
+
 async def parse_form_data(request: Request) -> dict:
-    form = await request.form()
-    return dict(form)
+    body = (await request.body()).decode("utf-8")
+    parsed = parse_qs(body, keep_blank_values=True)
+    return {key: values[-1] if values else "" for key, values in parsed.items()}
 
 
 @router.get("/tickets")
@@ -48,6 +63,9 @@ def ticket_list(request: Request, status: str | None = None, keyword: str | None
 @router.get("/tickets/{ticket_no}")
 def ticket_detail(request: Request, ticket_no: str, db: Session = Depends(get_db)):
     ticket = db.query(Ticket).filter(Ticket.ticket_no == ticket_no).first()
+    if not ticket:
+        raise HTTPException(status_code=404, detail="工单不存在")
+
     events = (
         db.query(TicketEvent)
         .filter(TicketEvent.ticket_no == ticket_no)
@@ -72,14 +90,18 @@ async def update_status_form(
     db: Session = Depends(get_db),
 ):
     form = await parse_form_data(request)
-    update_ticket_status(
-        db, ticket_no,
-        status=form.get("status", "PROCESSING"),
-        operator_account=form.get("operator_account", ""),
-        operator_name=form.get("operator_name", ""),
-        comment=form.get("comment", ""),
-    )
-    return RedirectResponse(url=f"/tickets/{ticket_no}", status_code=302)
+    try:
+        update_ticket_status(
+            db, ticket_no,
+            status=form.get("status", "PROCESSING"),
+            operator_account=form.get("operator_account", ""),
+            operator_name=form.get("operator_name", ""),
+            comment=form.get("comment", ""),
+        )
+    except ValueError as e:
+        status_code = 404 if "不存在" in str(e) else 400
+        raise HTTPException(status_code=status_code, detail=str(e))
+    return redirect_to_ticket_actions(ticket_no)
 
 
 @router.post("/tickets/{ticket_no}/comment-form")
@@ -95,7 +117,7 @@ async def add_comment_form(
         operator_name=form.get("operator_name", ""),
         comment=form.get("comment", ""),
     )
-    return RedirectResponse(url=f"/tickets/{ticket_no}", status_code=302)
+    return redirect_to_ticket_actions(ticket_no)
 
 
 @router.post("/tickets/{ticket_no}/close-form")
@@ -111,4 +133,4 @@ async def close_ticket_form(
         operator_name=form.get("operator_name", ""),
         resolved_result=form.get("resolved_result", ""),
     )
-    return RedirectResponse(url=f"/tickets/{ticket_no}", status_code=302)
+    return redirect_to_ticket_actions(ticket_no)

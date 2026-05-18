@@ -1,8 +1,9 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Literal, Optional
 from pydantic import BaseModel
 
 
 class CreateTicketRequest(BaseModel):
+    ticketNo: Optional[str] = None
     sourceChannel: str
     businessType: str
 
@@ -18,7 +19,7 @@ class CreateTicketRequest(BaseModel):
 
     issueType: Optional[str] = None
     severityType: Optional[str] = None
-    priority: Optional[str] = None
+    priority: Optional[Literal["P1", "P2", "P3", "P4"]] = None
 
     diagnosisSummary: Optional[str] = None
     internalSuggestion: Optional[str] = None
@@ -43,7 +44,7 @@ class ApiResponse(BaseModel):
 
 
 class UpdateStatusRequest(BaseModel):
-    status: str
+    status: Literal["NEW", "PROCESSING", "RESOLVED", "CLOSED"]
     operatorAccount: Optional[str] = None
     operatorName: Optional[str] = None
     comment: Optional[str] = None

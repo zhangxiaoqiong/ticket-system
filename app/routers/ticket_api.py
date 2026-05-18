@@ -28,7 +28,17 @@ async def create_ticket_api(req: CreateTicketRequest, db: Session = Depends(get_
         ticket, duplicated = create_ticket(db, req)
 
         if not duplicated:
-            await notify_group(db, ticket)
+            try:
+                await notify_group(db, ticket)
+            except Exception as notify_error:
+                db.rollback()
+                event = TicketEvent(
+                    ticket_no=ticket.ticket_no,
+                    event_type="NOTIFY_FAILED",
+                    event_content=f"工单已创建，但消息通知失败：{str(notify_error)}",
+                )
+                db.add(event)
+                db.commit()
 
         return ApiResponse(
             success=True,
@@ -43,12 +53,7 @@ async def create_ticket_api(req: CreateTicketRequest, db: Session = Depends(get_
         )
 
     except Exception as e:
-        return ApiResponse(
-            success=False,
-            code="500",
-            message=f"工单创建失败：{str(e)}",
-            data=None
-        )
+        raise HTTPException(status_code=500, detail=f"工单创建失败：{str(e)}")
 
 
 @router.get("")
@@ -135,7 +140,8 @@ def update_status_api(ticket_no: str, req: UpdateStatusRequest, db: Session = De
         )
         return {"success": True, "data": ticket}
     except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        status_code = 404 if "不存在" in str(e) else 400
+        raise HTTPException(status_code=status_code, detail=str(e))
 
 
 @router.post("/{ticket_no}/comments")

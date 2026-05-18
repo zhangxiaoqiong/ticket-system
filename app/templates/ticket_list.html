@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>工单列表 - 地址诊断工单系统</title>
+    <title>工单列表 - 顺心分单诊断工单系统</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; color: #333; }
@@ -37,10 +37,10 @@
 </head>
 <body>
 <div class="header">
-    <h1>地址诊断工单系统</h1>
+    <h1>顺心分单诊断工单系统</h1>
 </div>
 <div class="container">
-    <div class="filter-bar">
+    <form class="filter-bar" method="get" action="/tickets">
         <select name="status" onchange="this.form.submit()">
             <option value="">全部状态</option>
             <option value="NEW" {% if status=='NEW' %}selected{% endif %}>NEW 新建</option>
@@ -49,12 +49,8 @@
             <option value="CLOSED" {% if status=='CLOSED' %}selected{% endif %}>CLOSED 已关闭</option>
         </select>
         <input type="text" name="keyword" placeholder="工单号 / 地址 / 问题" value="{{ keyword }}" style="width: 260px;">
-        <button type="submit" onclick="document.forms[0].submit()">筛选</button>
+        <button type="submit">筛选</button>
         <a class="reset" href="/tickets">重置</a>
-    </div>
-    <form method="get" action="/tickets" style="display:none">
-        <input type="hidden" name="status" value="{{ status }}">
-        <input type="hidden" name="keyword" value="{{ keyword }}">
     </form>
 
     <div class="ticket-count">共 {{ tickets|length }} 条工单</div>
