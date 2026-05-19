@@ -21,6 +21,12 @@
         .section-action { --accent: #d97706; --soft: #fff7ed; }
         .section-events { --accent: #2563eb; --soft: #eff6ff; }
         .section-closed { --accent: #6b7280; --soft: #f5f5f5; }
+        .closed-summary { text-align: left; color: #374151; }
+        .closed-title { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 700; color: #374151; }
+        .closed-title::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: #6b7280; flex-shrink: 0; }
+        .closed-result { margin-top: 14px; padding: 14px 16px; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; }
+        .closed-result-label { color: #6b7280; font-size: 13px; margin-bottom: 8px; font-weight: 600; }
+        .closed-result-content { white-space: pre-wrap; word-break: break-word; line-height: 1.6; color: #1f2937; }
         .field-row { display: flex; margin-bottom: 10px; font-size: 14px; }
         .field-label { width: 140px; color: #666; flex-shrink: 0; }
         .field-value { flex: 1; word-break: break-all; }
@@ -166,14 +172,16 @@
         </div>
     </div>
     {% else %}
-    <div id="actions" class="section section-closed" style="text-align:center;color:#999;">
-        <p>工单已关闭</p>
-        {% if ticket.resolved_result %}
-        <div class="field-row" style="justify-content:center;margin-top:8px;">
-            <div class="field-label">处理结论</div>
-            <div class="field-value" style="white-space:pre-wrap;">{{ ticket.resolved_result }}</div>
+    <div id="actions" class="section section-closed">
+        <div class="closed-summary">
+            <div class="closed-title">工单已关闭</div>
+            {% if ticket.resolved_result and ticket.resolved_result != "状态下拉关闭" %}
+            <div class="closed-result">
+                <div class="closed-result-label">处理结论</div>
+                <div class="closed-result-content">{{ ticket.resolved_result }}</div>
+            </div>
+            {% endif %}
         </div>
-        {% endif %}
     </div>
     {% endif %}
 
