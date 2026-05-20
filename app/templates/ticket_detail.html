@@ -21,6 +21,11 @@
         .section-action { --accent: #d97706; --soft: #fff7ed; }
         .section-events { --accent: #2563eb; --soft: #eff6ff; }
         .section-closed { --accent: #6b7280; --soft: #f5f5f5; }
+        .page-group-label { display: flex; align-items: center; gap: 10px; margin: 22px 0 10px; color: #4b5563; font-size: 13px; font-weight: 700; }
+        .page-group-label:first-child { margin-top: 0; }
+        .page-group-label::after { content: ""; height: 1px; flex: 1; background: #dbe1ea; }
+        .section-action { box-shadow: 0 3px 14px rgba(217,119,6,0.16); border-top: 1px solid #f4d2a3; border-right: 1px solid #f4d2a3; border-bottom: 1px solid #f4d2a3; }
+        .section-events { margin-top: 22px; }
         .closed-summary { text-align: left; color: #374151; }
         .closed-title { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 700; color: #374151; }
         .closed-title::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: #6b7280; flex-shrink: 0; }
@@ -30,6 +35,8 @@
         .field-row { display: flex; margin-bottom: 10px; font-size: 14px; }
         .field-label { width: 140px; color: #666; flex-shrink: 0; }
         .field-value { flex: 1; word-break: break-all; }
+        .field-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 28px; row-gap: 10px; }
+        .field-grid .field-row { margin-bottom: 0; min-width: 0; }
         .status-badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 13px; font-weight: 600; }
         .status-NEW { background: #e3f2fd; color: #1565c0; }
         .status-PROCESSING { background: #fff3e0; color: #e65100; }
@@ -69,13 +76,11 @@
         .action-box .hint { color: #777; font-size: 12px; margin-bottom: 12px; line-height: 1.5; }
         .action-buttons { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
         .status-action { border-color: #f4d2a3; background: #fffdf8; }
-        .status-overview { display: flex; align-items: center; gap: 8px; margin: 10px 0 14px; padding: 8px 10px; background: #fff; border: 1px solid #eadfce; border-radius: 8px; }
-        .status-overview .arrow { color: #9ca3af; font-size: 14px; }
-        .status-card { display: flex; align-items: center; gap: 8px; min-width: 0; }
-        .status-card span { color: #777; font-size: 12px; white-space: nowrap; }
-        .status-card strong { display: inline-block; }
-        .status-pick-row { display: grid; grid-template-columns: 240px 1fr; gap: 14px; align-items: stretch; margin-bottom: 14px; }
-        .status-helper { padding: 30px 0 0; color: #6b7280; font-size: 13px; line-height: 1.6; min-height: 0; }
+        .status-label-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 6px; }
+        .status-inline { display: flex; align-items: center; gap: 6px; color: #777; font-size: 12px; white-space: nowrap; }
+        .status-inline .arrow { color: #9ca3af; }
+        .status-pick-row { display: grid; grid-template-columns: 240px 1fr; gap: 14px; align-items: center; margin-bottom: 14px; }
+        .status-helper { color: #6b7280; font-size: 13px; line-height: 1.6; min-height: 0; }
         .status-helper strong { display: none; }
         .status-comment-row { margin-top: 4px; }
         #statusComment { min-height: 138px; }
@@ -86,11 +91,12 @@
         @media (max-width: 720px) {
             .container { padding: 0 12px; }
             .field-row, .form-row { display: block; }
+            .field-grid { grid-template-columns: 1fr; }
             .field-label { width: auto; margin-bottom: 4px; }
             .form-row > div { margin-bottom: 10px; }
             .action-grid { grid-template-columns: 1fr; }
-            .status-overview { align-items: flex-start; flex-direction: column; }
-            .status-overview .arrow { display: none; }
+            .status-label-row { display: block; }
+            .status-inline { margin-top: 6px; white-space: normal; }
             .status-pick-row { grid-template-columns: 1fr; }
             button { width: 100%; margin-bottom: 8px; }
         }
@@ -103,22 +109,26 @@
 </div>
 <div class="container">
 
+    <div class="page-group-label">工单信息</div>
+
     <!-- 一、工单基础信息 -->
     <div class="section section-basic">
         <h2>一、工单基础信息</h2>
-        <div class="field-row"><div class="field-label">工单号</div><div class="field-value">{{ ticket.ticket_no }}</div></div>
-        <div class="field-row"><div class="field-label">状态</div><div class="field-value"><span class="status-badge status-{{ ticket.status }}">{{ ticket.status }}</span></div></div>
-        <div class="field-row"><div class="field-label">优先级</div><div class="field-value"><span class="priority-{{ ticket.priority }}">{{ ticket.priority }}</span></div></div>
-        <div class="field-row"><div class="field-label">问题类型</div><div class="field-value">{{ ticket.issue_type or "-" }}</div></div>
-        <div class="field-row"><div class="field-label">严重性</div><div class="field-value">{{ ticket.severity_type or "-" }}</div></div>
-        <div class="field-row"><div class="field-label">来源渠道</div><div class="field-value">{{ ticket.source_channel }}</div></div>
-        <div class="field-row"><div class="field-label">业务类型</div><div class="field-value">{{ ticket.business_type }}</div></div>
-        <div class="field-row"><div class="field-label">处理人</div><div class="field-value">{{ ticket.assigned_operator or "-" }}</div></div>
-        <div class="field-row"><div class="field-label">创建时间</div><div class="field-value">{{ ticket.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</div></div>
-        <div class="field-row"><div class="field-label">更新时间</div><div class="field-value">{{ ticket.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}</div></div>
-        {% if ticket.closed_at %}
-        <div class="field-row"><div class="field-label">关闭时间</div><div class="field-value">{{ ticket.closed_at.strftime('%Y-%m-%d %H:%M:%S') }}</div></div>
-        {% endif %}
+        <div class="field-grid">
+            <div class="field-row"><div class="field-label">工单号</div><div class="field-value">{{ ticket.ticket_no }}</div></div>
+            <div class="field-row"><div class="field-label">状态</div><div class="field-value"><span class="status-badge status-{{ ticket.status }}">{{ ticket.status }}</span></div></div>
+            <div class="field-row"><div class="field-label">优先级</div><div class="field-value"><span class="priority-{{ ticket.priority }}">{{ ticket.priority }}</span></div></div>
+            <div class="field-row"><div class="field-label">问题类型</div><div class="field-value">{{ ticket.issue_type or "-" }}</div></div>
+            <div class="field-row"><div class="field-label">严重性</div><div class="field-value">{{ ticket.severity_type or "-" }}</div></div>
+            <div class="field-row"><div class="field-label">来源渠道</div><div class="field-value">{{ ticket.source_channel }}</div></div>
+            <div class="field-row"><div class="field-label">业务类型</div><div class="field-value">{{ ticket.business_type }}</div></div>
+            <div class="field-row"><div class="field-label">处理人</div><div class="field-value">{{ ticket.assigned_operator or "-" }}</div></div>
+            <div class="field-row"><div class="field-label">创建时间</div><div class="field-value">{{ ticket.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</div></div>
+            <div class="field-row"><div class="field-label">更新时间</div><div class="field-value">{{ ticket.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}</div></div>
+            {% if ticket.closed_at %}
+            <div class="field-row"><div class="field-label">关闭时间</div><div class="field-value">{{ ticket.closed_at.strftime('%Y-%m-%d %H:%M:%S') }}</div></div>
+            {% endif %}
+        </div>
     </div>
 
     <!-- 二、用户反馈信息 -->
@@ -148,6 +158,8 @@
     </div>
     {% endif %}
 
+    <div class="page-group-label">工单处理</div>
+
     <!-- 操作区域 -->
     {% if ticket.status != "CLOSED" %}
     <div id="actions" class="section section-action">
@@ -172,20 +184,18 @@
                 <input type="hidden" name="operator_name">
                 <h3>更新状态</h3>
                 <div class="hint">先选择本次处理后的状态，再填写对应说明。保存后会写入处理记录。</div>
-                <div class="status-overview">
-                    <div class="status-card">
-                        <span>当前状态</span>
+                <div class="status-label-row">
+                    <label>工单状态</label>
+                    <div class="status-inline">
+                        <span>当前</span>
                         <strong class="status-badge status-{{ ticket.status }}">{{ ticket.status }}</strong>
-                    </div>
-                    <span class="arrow">→</span>
-                    <div class="status-card">
-                        <span>将保存为</span>
+                        <span class="arrow">→</span>
+                        <span>保存为</span>
                         <strong id="targetStatusBadge" class="status-badge status-{{ ticket.status }}">{{ ticket.status }}</strong>
                     </div>
                 </div>
                 <div class="status-pick-row">
                     <div>
-                        <label>工单状态</label>
                         <select id="statusSelect" name="status">
                             <option value="NEW" {% if ticket.status == "NEW" %}selected{% endif %}>NEW 新建</option>
                             <option value="PROCESSING" {% if ticket.status == "PROCESSING" %}selected{% endif %}>PROCESSING 处理中</option>
@@ -222,9 +232,9 @@
     </div>
     {% endif %}
 
-    <!-- 五、处理记录 -->
+    <div class="page-group-label">流转记录</div>
+
     <div class="section section-events">
-        <h2>五、处理记录</h2>
         {% if events %}
         <ul class="event-list">
             {% for e in events %}

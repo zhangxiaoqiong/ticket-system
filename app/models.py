@@ -7,6 +7,10 @@ from sqlalchemy.orm import declarative_base
 Base = declarative_base()
 
 
+def local_now():
+    return datetime.now()
+
+
 class Ticket(Base):
     __tablename__ = "ticket"
 
@@ -44,8 +48,8 @@ class Ticket(Base):
     assigned_operator = Column(String(128))
     resolved_result = Column(Text)
 
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=local_now, nullable=False)
+    updated_at = Column(DateTime, default=local_now, onupdate=local_now, nullable=False)
     resolved_at = Column(DateTime)
     closed_at = Column(DateTime)
 
@@ -72,7 +76,7 @@ class TicketEvent(Base):
     operator_name = Column(String(128))
     event_content = Column(Text)
 
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=local_now, nullable=False)
 
 
 Index("idx_event_ticket_no", TicketEvent.ticket_no)

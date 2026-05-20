@@ -1,10 +1,9 @@
 import hashlib
-from datetime import datetime
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.config import settings
-from app.models import Ticket, TicketEvent
+from app.models import Ticket, TicketEvent, local_now
 from app.schemas import CreateTicketRequest
 from app.services.id_generator import generate_ticket_no
 
@@ -151,9 +150,9 @@ def update_ticket_status(
         ticket.assigned_operator = operator_display
 
     if status == "RESOLVED":
-        ticket.resolved_at = datetime.utcnow()
+        ticket.resolved_at = local_now()
     elif status == "CLOSED":
-        ticket.closed_at = datetime.utcnow()
+        ticket.closed_at = local_now()
         ticket.resolved_result = comment
     elif old_status == "RESOLVED":
         ticket.resolved_at = None
@@ -217,7 +216,7 @@ def close_ticket(
     operator_display = clean(operator_name) or clean(operator_account)
     if operator_display:
         ticket.assigned_operator = operator_display
-    ticket.closed_at = datetime.utcnow()
+    ticket.closed_at = local_now()
 
     event = TicketEvent(
         ticket_no=ticket_no,
