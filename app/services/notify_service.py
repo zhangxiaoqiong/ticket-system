@@ -197,13 +197,12 @@ async def send_robot_message(
     failure_event_type: str,
     at_targets: dict[str, list[str]] | None = None,
     webhook_url: str | None = None,
-    skip_global_switch: bool = False,
 ) -> bool:
-    # skip_global_switch=True 时，只检查对应的功能开关，不检查 robot_enabled 总开关
-    if not skip_global_switch and not settings.robot_enabled:
+    # 检查处理完成通知开关（send_robot_message 只用于处理完成通知）
+    if not settings.robot_processed_notify_enabled:
         return False
 
-    webhook_url = webhook_url if webhook_url is not None else resolve_robot_webhook_url(ticket)
+    webhook_url = webhook_url if webhook_url is not None else resolve_processed_robot_webhook_url(ticket)
     if not webhook_url:
         return False
 
@@ -430,5 +429,4 @@ async def notify_ticket_items_processed(
         webhook_url=resolve_processed_robot_webhook_url(ticket),
         event_type="BOT_ITEMS_PROCESSED_NOTIFIED",
         failure_event_type="BOT_ITEMS_PROCESSED_NOTIFY_FAILED",
-        skip_global_switch=True,  # 处理完成通知独立控制，不受 robot_enabled 总开关影响
     )
