@@ -209,20 +209,95 @@ async def send_robot_message(
         return False
 
 
-def build_robot_message(ticket: Ticket) -> str:
-    return f"""【顺心分单诊断工单】{ticket.ticket_no}
+def clean_text(value: Any, default: str = "-") -> str:
+    text = str(value or "").strip()
+    return text if text else default
 
-优先级：{ticket.priority}
-问题类型：{ticket.issue_type or ""}
-用户账号：{ticket.reporter_account or ticket.channel_user_id or ""}
 
-地址：{ticket.full_address or ""}
+def compact_text(value: Any, max_length: int = 180) -> str:
+    text = re.sub(r"\s+", " ", str(value or "").strip())
+    if not text:
+        return "-"
+    if len(text) <= max_length:
+        return text
+    return f"{text[:max_length]}..."
 
-诊断结论：{ticket.diagnosis_summary or ""}
-处理建议：{ticket.internal_suggestion or ""}
 
-工单链接：{ticket.ticket_url}
-"""
+def item_suggestion_text(item: TicketItem) -> str:
+    suggestion = item.operation_suggestion or {}
+    if isinstance(suggestion, dict):
+        return compact_text(suggestion.get("suggestion") or suggestion.get("problemDiagnosis"))
+    return compact_text(suggestion)
+
+
+def item_problem_text(item: TicketItem) -> str:
+    return compact_text(item.issue_description or item.user_query)
+
+
+def item_issue_types(ticket: Ticket, items: list[TicketItem]) -> str:
+    values: list[str] = []
+    for value in [ticket.issue_type, *(item.issue_type for item in items)]:
+        text = clean_text(value, "")
+        if text and text not in values:
+            values.append(text)
+    return "、".join(values) if values else "-"
+
+
+def address_summary(items: list[TicketItem], max_items: int = 5) -> str:
+    addresses = [clean_text(item.full_address, "") for item in items]
+    addresses = [address for address in addresses if address]
+    if not addresses:
+        return "-"
+    lines = [f"{index}. {address}" for index, address in enumerate(addresses[:max_items], start=1)]
+    if len(addresses) > max_items:
+        lines.append(f"...等 {len(addresses)} 条")
+    return "\n".join(lines)
+
+
+def build_robot_message(ticket: Ticket, items: list[TicketItem] | None = None) -> str:
+    items = sorted(items or [], key=lambda item: item.item_no or 0)
+    reporter = clean_text(ticket.reporter_account or ticket.channel_user_id)
+    reporter_group = clean_text(ticket.reporter_group)
+
+    lines = [
+        f"【顺心分单诊断工单】{ticket.ticket_no}",
+        "",
+        f"优先级：{clean_text(ticket.priority)}",
+        f"问题类型：{item_issue_types(ticket, items)}",
+        f"反馈群：{reporter_group}",
+        f"用户账号：{reporter}",
+    ]
+
+    if len(items) > 1:
+        lines.extend([
+            "",
+            f"地址数量：{len(items)}",
+            f"地址摘要：\n{address_summary(items)}",
+            "",
+            "诊断结论：批量地址诊断已完成，请进入工单详情逐条查看。",
+            "处理建议：请在工单详情中按地址明细处理，可单条处理或批量处理。",
+        ])
+    elif len(items) == 1:
+        item = items[0]
+        lines.extend(["", f"地址数量：{len(items)}"])
+        lines.extend([
+            "",
+            f"地址：{clean_text(item.full_address)}",
+            f"反馈问题：{item_problem_text(item)}",
+            f"诊断结论：{compact_text(item.diagnosis_summary)}",
+            f"处理建议：{item_suggestion_text(item)}",
+        ])
+    else:
+        lines.extend([
+            "",
+            f"地址：{clean_text(ticket.full_address)}",
+            "",
+            f"诊断结论：{compact_text(ticket.diagnosis_summary)}",
+            f"处理建议：{compact_text(ticket.internal_suggestion)}",
+        ])
+
+    lines.extend(["", f"工单链接：{clean_text(ticket.ticket_url)}"])
+    return "\n".join(lines)
 
 
 def build_items_processed_message(items: list[TicketItem], reply_desc: str = "") -> str:
@@ -281,13 +356,20 @@ async def notify_fs_next(db: Session, ticket: Ticket, content: str) -> bool:
 
 
 async def notify_group(db: Session, ticket: Ticket) -> None:
-    content = build_robot_message(ticket)
+    items = (
+        db.query(TicketItem)
+        .filter(TicketItem.ticket_no == ticket.ticket_no)
+        .order_by(TicketItem.item_no.asc(), TicketItem.id.asc())
+        .all()
+    )
+    content = build_robot_message(ticket, items)
     if await send_robot_message(
         db,
         ticket,
         content=content,
         event_type="BOT_NOTIFIED",
         failure_event_type="NOTIFY_FAILED",
+        at_targets=resolve_robot_at_targets(ticket, items),
     ):
         return
 
