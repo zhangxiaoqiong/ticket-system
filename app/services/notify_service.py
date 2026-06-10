@@ -38,6 +38,7 @@ def parse_json_map(value: str, setting_name: str) -> dict[str, Any]:
 
 def ticket_match_keys(ticket: Ticket) -> list[str]:
     return [
+        ticket.reporter_group or "",
         ticket.reporter_account or "",
         ticket.channel_user_id or "",
         ticket.owner_key or "",
