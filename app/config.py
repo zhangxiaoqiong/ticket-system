@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     robot_proxy_url: str = ""
     robot_enabled: bool = True
     robot_processed_notify_enabled: bool = True
+    robot_processed_webhook_url: str = ""
+    robot_processed_webhook_map: str = ""
     robot_processed_statuses: str = "RESOLVED,CLOSED"
     robot_at_mobiles: str = ""
     robot_at_user_ids: str = ""

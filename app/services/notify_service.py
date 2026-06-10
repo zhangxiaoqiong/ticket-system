@@ -36,12 +36,8 @@ def parse_json_map(value: str, setting_name: str) -> dict[str, Any]:
     return parsed
 
 
-def ticket_match_keys(ticket: Ticket) -> list[str]:
+def ticket_ops_match_keys(ticket: Ticket) -> list[str]:
     return [
-        ticket.reporter_group or "",
-        ticket.reporter_account or "",
-        ticket.channel_user_id or "",
-        ticket.owner_key or "",
         ticket.business_type or "",
         ticket.source_channel or "",
         ticket.priority or "",
@@ -49,8 +45,18 @@ def ticket_match_keys(ticket: Ticket) -> list[str]:
     ]
 
 
-def resolve_map_value(mapping: dict[str, Any], ticket: Ticket) -> Any:
-    for key in ticket_match_keys(ticket):
+def ticket_user_match_keys(ticket: Ticket) -> list[str]:
+    return [
+        ticket.reporter_group or "",
+        ticket.reporter_account or "",
+        ticket.channel_user_id or "",
+        ticket.owner_key or "",
+        "default",
+    ]
+
+
+def resolve_map_value(mapping: dict[str, Any], ticket: Ticket, match_keys: list[str] | None = None) -> Any:
+    for key in match_keys or ticket_ops_match_keys(ticket):
         if key and key in mapping:
             return mapping[key]
     return None
@@ -101,7 +107,7 @@ def resolve_ticket_notify_user_ids(ticket: Ticket) -> list[str]:
 
 def resolve_robot_at_targets(ticket: Ticket, items: list[TicketItem] | None = None) -> dict[str, list[str]]:
     at_map = parse_json_map(settings.robot_at_map, "robot_at_map")
-    mapped = normalize_at_value(resolve_map_value(at_map, ticket))
+    mapped = normalize_at_value(resolve_map_value(at_map, ticket, ticket_user_match_keys(ticket)))
     configured = {
         "atMobiles": split_values(settings.robot_at_mobiles),
         "atUserIds": split_values(settings.robot_at_user_ids),
@@ -118,7 +124,7 @@ def resolve_robot_at_targets(ticket: Ticket, items: list[TicketItem] | None = No
 
 def resolve_robot_webhook_url(ticket: Ticket) -> str:
     webhook_map = parse_json_map(settings.robot_webhook_map, "robot_webhook_map")
-    mapped = resolve_map_value(webhook_map, ticket)
+    mapped = resolve_map_value(webhook_map, ticket, ticket_ops_match_keys(ticket))
     if isinstance(mapped, list):
         return str(mapped[0]).strip() if mapped else ""
     if mapped:
@@ -126,9 +132,19 @@ def resolve_robot_webhook_url(ticket: Ticket) -> str:
     return settings.robot_webhook_url
 
 
+def resolve_processed_robot_webhook_url(ticket: Ticket) -> str:
+    webhook_map = parse_json_map(settings.robot_processed_webhook_map, "robot_processed_webhook_map")
+    mapped = resolve_map_value(webhook_map, ticket, ticket_user_match_keys(ticket))
+    if isinstance(mapped, list):
+        return str(mapped[0]).strip() if mapped else ""
+    if mapped:
+        return str(mapped).strip()
+    return settings.robot_processed_webhook_url
+
+
 def resolve_fs_next_group_ids(ticket: Ticket) -> list[str]:
     group_map = parse_json_map(settings.fs_next_group_map, "fs_next_group_map")
-    mapped = resolve_map_value(group_map, ticket)
+    mapped = resolve_map_value(group_map, ticket, ticket_ops_match_keys(ticket))
     if mapped is not None:
         return normalize_values(mapped)
     return split_values(settings.fs_next_group_ids)
@@ -180,11 +196,12 @@ async def send_robot_message(
     event_type: str,
     failure_event_type: str,
     at_targets: dict[str, list[str]] | None = None,
+    webhook_url: str | None = None,
 ) -> bool:
     if not settings.robot_enabled:
         return False
 
-    webhook_url = resolve_robot_webhook_url(ticket)
+    webhook_url = webhook_url if webhook_url is not None else resolve_robot_webhook_url(ticket)
     if not webhook_url:
         return False
 
@@ -357,24 +374,15 @@ async def notify_fs_next(db: Session, ticket: Ticket, content: str) -> bool:
 
 
 async def notify_group(db: Session, ticket: Ticket) -> None:
-    items = (
-        db.query(TicketItem)
-        .filter(TicketItem.ticket_no == ticket.ticket_no)
-        .order_by(TicketItem.item_no.asc(), TicketItem.id.asc())
-        .all()
-    )
-    content = build_robot_message(ticket, items)
-    if await send_robot_message(
-        db,
-        ticket,
-        content=content,
-        event_type="BOT_NOTIFIED",
-        failure_event_type="NOTIFY_FAILED",
-        at_targets=resolve_robot_at_targets(ticket, items),
-    ):
-        return
-
+    """创建工单时通知运营群：优先使用丰声Next，不使用钉钉webhook。"""
     try:
+        items = (
+            db.query(TicketItem)
+            .filter(TicketItem.ticket_no == ticket.ticket_no)
+            .order_by(TicketItem.item_no.asc(), TicketItem.id.asc())
+            .all()
+        )
+        content = build_robot_message(ticket, items)
         await notify_fs_next(db, ticket, content)
     except Exception as exc:
         event = TicketEvent(
@@ -417,6 +425,7 @@ async def notify_ticket_items_processed(
         ticket,
         content=content,
         at_targets=at_targets,
+        webhook_url=resolve_processed_robot_webhook_url(ticket),
         event_type="BOT_ITEMS_PROCESSED_NOTIFIED",
         failure_event_type="BOT_ITEMS_PROCESSED_NOTIFY_FAILED",
     )
