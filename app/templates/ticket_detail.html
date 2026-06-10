@@ -5,341 +5,705 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ ticket.ticket_no }} - 工单详情</title>
     <style>
+        :root {
+            --c-primary: #2563eb;
+            --c-primary-hover: #1d4ed8;
+            --c-primary-light: #eff6ff;
+            --c-surface: #ffffff;
+            --c-bg: #f1f5f9;
+            --c-border: #e2e8f0;
+            --c-border-light: #f1f5f9;
+            --c-text: #1e293b;
+            --c-text-secondary: #64748b;
+            --c-text-muted: #94a3b8;
+            --c-new: #2563eb;
+            --c-processing: #f59e0b;
+            --c-resolved: #16a34a;
+            --c-closed: #16a34a;
+            --radius-card: 10px;
+            --radius-input: 8px;
+            --radius-badge: 18px;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px -2px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.04);
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; color: #333; }
-        .header { position: sticky; top: 0; z-index: 20; background: #1a73e8; color: #fff; padding: 14px 24px; display: flex; align-items: center; gap: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.12); }
-        .header a { color: #fff; text-decoration: none; opacity: 0.9; }
-        .header a:hover { opacity: 1; }
-        .header h1 { font-size: 18px; font-weight: 600; }
-        .container { max-width: 1000px; margin: 20px auto; padding: 0 20px; }
-        .section { --accent: #1a73e8; --soft: #f3f8ff; background: #fff; border-radius: 8px; padding: 18px 20px 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 5px solid var(--accent); }
-        .section h2 { font-size: 16px; font-weight: 600; margin: -6px -8px 16px; padding: 10px 12px; border-bottom: 1px solid #eef1f5; color: #1f2937; background: var(--soft); border-radius: 6px; }
-        .section-basic { --accent: #1a73e8; --soft: #eef5ff; }
-        .section-feedback { --accent: #0f766e; --soft: #edfafa; }
-        .section-diagnosis { --accent: #7c3aed; --soft: #f5f0ff; }
-        .section-json { --accent: #64748b; --soft: #f4f6f8; }
-        .section-action { --accent: #d97706; --soft: #fff7ed; }
-        .section-events { --accent: #2563eb; --soft: #eff6ff; }
-        .section-closed { --accent: #6b7280; --soft: #f5f5f5; }
-        .page-group-label { display: flex; align-items: center; gap: 10px; margin: 22px 0 10px; color: #4b5563; font-size: 13px; font-weight: 700; }
-        .page-group-label:first-child { margin-top: 0; }
-        .page-group-label::after { content: ""; height: 1px; flex: 1; background: #dbe1ea; }
-        .section-action { box-shadow: 0 3px 14px rgba(217,119,6,0.16); border-top: 1px solid #f4d2a3; border-right: 1px solid #f4d2a3; border-bottom: 1px solid #f4d2a3; }
-        .section-events { margin-top: 22px; }
-        .closed-summary { text-align: left; color: #374151; }
-        .closed-title { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 700; color: #374151; }
-        .closed-title::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: #6b7280; flex-shrink: 0; }
-        .closed-result { margin-top: 14px; padding: 14px 16px; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; }
-        .closed-result-label { color: #6b7280; font-size: 13px; margin-bottom: 8px; font-weight: 600; }
-        .closed-result-content { white-space: pre-wrap; word-break: break-word; line-height: 1.6; color: #1f2937; }
-        .field-row { display: flex; margin-bottom: 10px; font-size: 14px; }
-        .field-label { width: 140px; color: #666; flex-shrink: 0; }
-        .field-value { flex: 1; word-break: break-all; }
-        .field-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 28px; row-gap: 10px; }
-        .field-grid .field-row { margin-bottom: 0; min-width: 0; }
-        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 13px; font-weight: 600; }
-        .status-NEW { background: #e3f2fd; color: #1565c0; }
-        .status-PROCESSING { background: #fff3e0; color: #e65100; }
-        .status-RESOLVED { background: #e8f5e9; color: #2e7d32; }
-        .status-CLOSED { background: #f5f5f5; color: #616161; }
-        .priority-P1 { color: #d32f2f; font-weight: 700; }
-        .priority-P2 { color: #f57c00; font-weight: 700; }
-        .priority-P3 { color: #616161; }
-        .priority-P4 { color: #9e9e9e; }
-        textarea, input[type="text"], select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit; resize: vertical; }
-        textarea:focus, input[type="text"]:focus, select:focus { outline: none; border-color: #1a73e8; box-shadow: 0 0 0 3px rgba(26,115,232,0.12); }
-        textarea { min-height: 80px; }
-        .form-row { display: flex; gap: 12px; margin-bottom: 12px; }
-        .form-row > div { flex: 1; }
-        .form-row label { font-size: 13px; color: #666; margin-bottom: 4px; display: block; }
-        .form-row input, .form-row select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
-        button { padding: 8px 20px; background: #1a73e8; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
-        button:hover { background: #1557b0; }
-        button.secondary { background: #666; }
-        button.danger { background: #d32f2f; }
-        button.success { background: #2e7d32; }
-        button.success:hover { background: #1f5f24; }
-        button:disabled { background: #c8ccd2; cursor: not-allowed; }
-        .event-list { list-style: none; }
-        .event-item { padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
-        .event-item:last-child { border-bottom: none; }
-        .event-type { font-weight: 600; color: #1a73e8; font-size: 13px; }
-        .event-time { color: #999; font-size: 12px; margin-left: 8px; }
-        .event-content { margin-top: 6px; font-size: 14px; white-space: pre-wrap; word-break: break-all; }
-        .event-operator { color: #666; font-size: 12px; margin-top: 4px; }
-        pre.json-block { background: #f5f7fa; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 12px; max-height: 400px; }
-        .operator-bar { background: #f8fafd; border: 1px solid #e4ebf5; border-radius: 8px; padding: 14px; margin-bottom: 16px; }
-        .operator-title { font-size: 13px; color: #555; margin-bottom: 10px; font-weight: 600; }
-        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
-        .action-box { border: 1px solid #e6e8eb; border-radius: 8px; padding: 16px; background: #fff; min-height: 100%; }
-        .action-box h3 { font-size: 15px; margin-bottom: 6px; color: #222; }
-        .action-box .hint { color: #777; font-size: 12px; margin-bottom: 12px; line-height: 1.5; }
-        .action-buttons { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
-        .status-action { border-color: #f4d2a3; background: #fffdf8; }
-        .status-label-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 6px; }
-        .status-inline { display: flex; align-items: center; gap: 6px; color: #777; font-size: 12px; white-space: nowrap; }
-        .status-inline .arrow { color: #9ca3af; }
-        .status-pick-row { display: grid; grid-template-columns: 240px 1fr; gap: 14px; align-items: center; margin-bottom: 14px; }
-        .status-helper { color: #6b7280; font-size: 13px; line-height: 1.6; min-height: 0; }
-        .status-helper strong { display: none; }
-        .status-comment-row { margin-top: 4px; }
-        #statusComment { min-height: 138px; }
-        .status-warning { display: none; margin-top: 12px; margin-bottom: 6px; padding: 10px 12px; border-radius: 8px; border: 1px solid #f0b4b4; background: #fff5f5; color: #9f1d1d; font-size: 13px; }
-        .status-warning.active { display: block; }
-        .close-box { margin-top: 16px; border-color: #f2c8c8; background: #fffafa; }
-        .close-box h3 { color: #b3261e; }
-        @media (max-width: 720px) {
-            .container { padding: 0 12px; }
-            .field-row, .form-row { display: block; }
-            .field-grid { grid-template-columns: 1fr; }
-            .field-label { width: auto; margin-bottom: 4px; }
-            .form-row > div { margin-bottom: 10px; }
-            .action-grid { grid-template-columns: 1fr; }
-            .status-label-row { display: block; }
-            .status-inline { margin-top: 6px; white-space: normal; }
-            .status-pick-row { grid-template-columns: 1fr; }
-            button { width: 100%; margin-bottom: 8px; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+            background: var(--c-bg);
+            color: var(--c-text);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        a { color: var(--c-primary); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            height: 58px;
+            padding: 0 32px;
+            background: #1a73e8;
+            color: #fff;
+            border-bottom: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; min-width: 0; }
+        .breadcrumb a { color: #fff; opacity: 0.92; }
+        .breadcrumb a:hover { opacity: 1; }
+        .breadcrumb-current { color: #fff; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .operator-info { display: flex; align-items: center; gap: 12px; color: #fff; font-size: 13px; white-space: nowrap; }
+        .operator-info a { color: #fff; opacity: 0.9; border: 1px solid rgba(255,255,255,0.45); border-radius: 6px; padding: 4px 10px; }
+        .operator-info a:hover { opacity: 1; }
+        .page-layout {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px 32px 48px;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 340px;
+            gap: 24px;
+            align-items: start;
+        }
+        .main-col { min-width: 0; }
+        .side-col { position: sticky; top: 82px; }
+        .card {
+            background: var(--c-surface);
+            border: 1px solid var(--c-border);
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 18px;
+            overflow: hidden;
+        }
+        .card-inner { padding: 18px 22px; }
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+        .card-title::before {
+            content: "";
+            width: 4px;
+            height: 18px;
+            border-radius: 2px;
+            background: var(--c-primary);
+        }
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px 4px 8px;
+            border-radius: var(--radius-badge);
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .status-badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; }
+        .status-NEW { background: #eff6ff; color: #1e40af; }
+        .status-NEW::before { background: var(--c-new); }
+        .status-PROCESSING { background: #fffbeb; color: #92400e; }
+        .status-PROCESSING::before { background: var(--c-processing); }
+        .status-RESOLVED { background: #f0fdf4; color: #166534; }
+        .status-RESOLVED::before { background: var(--c-resolved); }
+        .status-CLOSED { background: #f0fdf4; color: #166534; }
+        .status-CLOSED::before { background: var(--c-closed); }
+        .item-accent-NEW { background: var(--c-new); }
+        .item-accent-PROCESSING { background: var(--c-processing); }
+        .item-accent-RESOLVED { background: var(--c-resolved); }
+        .item-accent-CLOSED { background: var(--c-closed); }
+        .priority-P1 { color: #dc2626; font-weight: 700; }
+        .priority-P2 { color: #ea580c; font-weight: 700; }
+        .priority-P3 { color: var(--c-text-secondary); font-weight: 600; }
+        .priority-P4 { color: var(--c-text-muted); font-weight: 600; }
+        .progress-summary { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+        .progress-main-number { font-size: 24px; line-height: 1; font-weight: 800; color: var(--c-text); }
+        .progress-main-label { margin-top: 5px; color: var(--c-text-muted); font-size: 12px; }
+        .progress-percent { color: var(--c-primary); font-size: 13px; font-weight: 800; line-height: 1.2; padding-top: 2px; }
+        .progress-bar-wrap { margin-bottom: 14px; }
+        .progress-track { width: 100%; height: 6px; background: var(--c-border); border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0; border-radius: 3px; background: linear-gradient(90deg, var(--c-primary), var(--c-resolved)); }
+        .progress-text { margin-top: 6px; font-size: 12px; color: var(--c-text-secondary); font-weight: 600; }
+        .progress-status-list { display: grid; gap: 8px; }
+        .progress-status-row {
+            width: 100%;
+            border: 1px solid var(--c-border);
+            background: var(--c-surface);
+            color: var(--c-text-secondary);
+            border-radius: var(--radius-input);
+            padding: 9px 10px;
+            cursor: pointer;
+            font: inherit;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            text-align: left;
+            transition: all .16s ease;
+        }
+        .progress-status-row:hover { border-color: #c7d2fe; background: var(--c-primary-light); color: var(--c-primary); }
+        .progress-status-row.is-active { border-color: var(--c-primary); background: var(--c-primary-light); color: var(--c-primary); box-shadow: inset 3px 0 0 var(--c-primary); }
+        .progress-status-label { display: flex; align-items: center; gap: 8px; min-width: 0; font-weight: 700; }
+        .progress-dot { width: 7px; height: 7px; border-radius: 999px; flex-shrink: 0; background: var(--c-primary); }
+        .progress-dot.NEW { background: var(--c-new); }
+        .progress-dot.PROCESSING { background: var(--c-processing); }
+        .progress-dot.RESOLVED { background: var(--c-resolved); }
+        .progress-count { min-width: 22px; text-align: right; color: var(--c-text); font-weight: 800; }
+        .progress-status-row.is-active .progress-count { color: var(--c-primary); }
+        .batch-panel {
+            margin: 0;
+            padding: 0;
+            border-top: none;
+            background: transparent;
+        }
+        .batch-panel-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .batch-title { display: flex; align-items: center; gap: 10px; min-width: 0; color: var(--c-text-secondary); font-size: 13px; font-weight: 700; }
+        .batch-title small { color: var(--c-text-muted); font-weight: 500; }
+        .batch-form-grid {
+            display: grid;
+            grid-template-columns: 150px minmax(0, 1fr) auto;
+            gap: 10px;
+            align-items: start;
+        }
+        .item-list { display: grid; gap: 16px; }
+        .item-card {
+            background: var(--c-surface);
+            border: 1px solid var(--c-border);
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+        .item-card:hover { box-shadow: var(--shadow-md); }
+        .item-card.is-hidden { display: none; }
+        .item-card-inner { display: flex; min-width: 0; }
+        .item-accent-bar { width: 4px; flex-shrink: 0; }
+        .item-body { flex: 1; min-width: 0; }
+        .item-info { padding: 16px 20px; }
+        .item-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+        .item-title { display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
+        .item-title input { width: 16px; height: 16px; margin-top: 3px; flex-shrink: 0; accent-color: var(--c-primary); }
+        .item-title h2 { font-size: 15px; line-height: 1.45; word-break: break-word; }
+        .item-head-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+        .item-fields {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 7px 16px;
+            margin-top: 12px;
+            padding: 11px 14px;
+            background: var(--c-bg);
+            border-radius: var(--radius-input);
+            font-size: 13px;
+        }
+        .item-field { display: flex; gap: 6px; min-width: 0; }
+        .item-field-label { color: var(--c-text-muted); white-space: nowrap; }
+        .item-field-value { color: var(--c-text-secondary); word-break: break-word; min-width: 0; }
+        .detail-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 10px;
+            padding: 4px 10px;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            color: var(--c-primary);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .detail-toggle:hover { background: var(--c-primary-light); }
+        .detail-toggle .chevron { display: inline-block; transition: transform .2s; }
+        .detail-toggle.is-open .chevron { transform: rotate(180deg); }
+        .detail-panel { max-height: 0; overflow: hidden; transition: max-height .25s ease; }
+        .detail-panel.is-open { max-height: 9000px; }
+        .detail-inner { padding: 0 20px 16px; }
+        .detail-tabs { display: flex; gap: 4px; margin-bottom: 12px; flex-wrap: wrap; }
+        .detail-tab {
+            padding: 6px 12px;
+            border: 1px solid var(--c-border);
+            border-radius: 6px;
+            background: var(--c-bg);
+            color: var(--c-text-muted);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .detail-tab.is-active { background: var(--c-primary-light); color: var(--c-primary); border-color: var(--c-primary); }
+        .detail-pane { display: none; }
+        .detail-pane.is-active { display: block; }
+        .diagnosis-text {
+            white-space: pre-wrap;
+            word-break: break-word;
+            background: var(--c-bg);
+            border: 1px solid var(--c-border);
+            border-radius: var(--radius-input);
+            padding: 12px 14px;
+            font-size: 13px;
+            line-height: 1.65;
+        }
+        .result-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .result-block {
+            background: var(--c-bg);
+            border: 1px solid var(--c-border);
+            border-radius: var(--radius-input);
+            padding: 13px 14px;
+        }
+        .result-block h3 { font-size: 13px; margin-bottom: 8px; }
+        .mini-row { display: flex; gap: 8px; margin-bottom: 6px; font-size: 12px; }
+        .mini-label { width: 78px; color: var(--c-text-muted); flex-shrink: 0; }
+        .mini-value { color: var(--c-text-secondary); word-break: break-word; min-width: 0; }
+        .json-block {
+            background: #0f172a;
+            color: #cbd5e1;
+            padding: 14px;
+            border-radius: var(--radius-input);
+            overflow-x: auto;
+            max-height: 420px;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        .item-action-zone { padding: 14px 20px; border-top: 1px solid var(--c-border); background: #fafbfc; }
+        .action-zone-head { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+        .action-zone-title { font-size: 12px; font-weight: 700; color: var(--c-text-secondary); }
+        .action-zone-hint { font-size: 11px; color: var(--c-text-muted); }
+        .action-form { display: flex; gap: 10px; align-items: flex-start; flex-wrap: wrap; }
+        .action-form-field { flex: 1; min-width: 150px; }
+        .action-form-field.is-status { max-width: 170px; }
+        label { display: block; margin-bottom: 4px; color: var(--c-text-secondary); font-size: 12px; font-weight: 700; }
+        select, textarea {
+            width: 100%;
+            border: 1px solid var(--c-border);
+            border-radius: var(--radius-input);
+            background: var(--c-surface);
+            color: var(--c-text);
+            font: inherit;
+            font-size: 13px;
+            padding: 8px 10px;
+        }
+        textarea { min-height: 40px; resize: vertical; }
+        select:focus, textarea:focus { outline: none; border-color: var(--c-primary); box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid transparent;
+            border-radius: var(--radius-input);
+            padding: 8px 14px;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-primary { background: var(--c-primary); color: #fff; }
+        .btn-primary:hover { background: var(--c-primary-hover); }
+        .action-form .btn-primary { align-self: flex-end; }
+        .btn-mini {
+            border: 1px solid var(--c-border);
+            border-radius: 6px;
+            background: var(--c-surface);
+            color: var(--c-text-secondary);
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .btn-mini:hover { color: var(--c-primary); border-color: var(--c-primary); background: var(--c-primary-light); }
+        .summary-item { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--c-border-light); font-size: 13px; }
+        .summary-item:last-child { border-bottom: none; }
+        .summary-label { color: var(--c-text-muted); }
+        .summary-value { color: var(--c-text); font-weight: 700; text-align: right; word-break: break-word; }
+        .batch-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .batch-header h3 { font-size: 15px; }
+        .batch-count { color: var(--c-primary); background: var(--c-primary-light); border-radius: 10px; padding: 2px 8px; font-size: 12px; font-weight: 700; }
+        .batch-select-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px; }
+        .operator-bar-mini { color: var(--c-text-muted); background: var(--c-bg); border-radius: var(--radius-input); padding: 8px 10px; margin-bottom: 12px; font-size: 12px; }
+        .form-group { margin-bottom: 0; }
+        .form-help { margin-top: 4px; color: var(--c-text-muted); font-size: 12px; line-height: 1.4; }
+        .batch-submit-btn { min-width: 150px; align-self: end; }
+        .timeline { position: relative; padding-left: 24px; }
+        .timeline::before { content: ""; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 2px; border-radius: 1px; background: var(--c-border); }
+        .timeline-item { position: relative; padding-bottom: 18px; }
+        .timeline-item:last-child { padding-bottom: 0; }
+        .timeline-dot { position: absolute; left: -21px; top: 5px; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--c-primary); background: var(--c-surface); }
+        .timeline-item:first-child .timeline-dot { background: var(--c-primary); }
+        .timeline-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+        .timeline-type { color: var(--c-primary); font-weight: 700; font-size: 13px; }
+        .timeline-time { color: var(--c-text-muted); font-size: 12px; }
+        .timeline-status { color: var(--c-text-muted); background: var(--c-bg); border-radius: 4px; padding: 1px 6px; font-size: 11px; }
+        .timeline-content { color: var(--c-text-secondary); white-space: pre-wrap; word-break: break-word; font-size: 13px; }
+        .empty { color: var(--c-text-muted); text-align: center; padding: 28px; font-size: 13px; }
+        @media (max-width: 1000px) {
+            .header { padding: 12px 16px; height: auto; align-items: flex-start; flex-direction: column; }
+            .page-layout { grid-template-columns: 1fr; padding: 16px; }
+            .side-col { position: static; }
+            .item-fields, .result-grid { grid-template-columns: 1fr 1fr; }
+            .batch-panel-head { display: block; }
+            .batch-select-actions { justify-content: flex-start; margin-top: 8px; }
+            .batch-form-grid { grid-template-columns: 1fr; }
+            .batch-submit-btn { width: 100%; }
+        }
+        @media (max-width: 640px) {
+            .item-head, .action-zone-head { display: block; }
+            .item-head-right { margin-top: 10px; }
+            .item-fields, .result-grid { grid-template-columns: 1fr; }
+            .action-form { display: block; }
+            .action-form-field, .action-form-field.is-status { max-width: none; margin-bottom: 10px; }
+            .btn { width: 100%; }
         }
     </style>
 </head>
 <body>
 <div class="header">
-    <a href="{{ request.url_for('ticket_list') }}">&larr; 返回列表</a>
-    <h1>{{ ticket.ticket_no }}</h1>
+    <div class="breadcrumb">
+        <a href="{{ request.url_for('ticket_list') }}">工单列表</a>
+        <span>/</span>
+        <span class="breadcrumb-current">{{ ticket.ticket_no }}</span>
+        <span class="status-badge status-{{ ticket.status }}">{{ ticket.status | status_text }}</span>
+    </div>
+    <div class="operator-info">
+        <span>运营处理人：{{ operator.name or "-" }}（{{ operator.account }}）</span>
+        <a href="{{ request.url_for('operator_logout') }}">退出登录</a>
+    </div>
 </div>
-<div class="container">
 
-    <div class="page-group-label">工单信息</div>
-
-    <!-- 一、工单基础信息 -->
-    <div class="section section-basic">
-        <h2>一、工单基础信息</h2>
-        <div class="field-grid">
-            <div class="field-row"><div class="field-label">工单号</div><div class="field-value">{{ ticket.ticket_no }}</div></div>
-            <div class="field-row"><div class="field-label">状态</div><div class="field-value"><span class="status-badge status-{{ ticket.status }}">{{ ticket.status }}</span></div></div>
-            <div class="field-row"><div class="field-label">优先级</div><div class="field-value"><span class="priority-{{ ticket.priority }}">{{ ticket.priority }}</span></div></div>
-            <div class="field-row"><div class="field-label">问题类型</div><div class="field-value">{{ ticket.issue_type or "-" }}</div></div>
-            <div class="field-row"><div class="field-label">严重性</div><div class="field-value">{{ ticket.severity_type or "-" }}</div></div>
-            <div class="field-row"><div class="field-label">来源渠道</div><div class="field-value">{{ ticket.source_channel }}</div></div>
-            <div class="field-row"><div class="field-label">业务类型</div><div class="field-value">{{ ticket.business_type }}</div></div>
-            <div class="field-row"><div class="field-label">处理人</div><div class="field-value">{{ ticket.assigned_operator or "-" }}</div></div>
-            <div class="field-row"><div class="field-label">创建时间</div><div class="field-value">{{ ticket.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</div></div>
-            <div class="field-row"><div class="field-label">更新时间</div><div class="field-value">{{ ticket.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}</div></div>
-            {% if ticket.closed_at %}
-            <div class="field-row"><div class="field-label">关闭时间</div><div class="field-value">{{ ticket.closed_at.strftime('%Y-%m-%d %H:%M:%S') }}</div></div>
-            {% endif %}
-        </div>
-    </div>
-
-    <!-- 二、用户反馈信息 -->
-    <div class="section section-feedback">
-        <h2>二、用户反馈信息</h2>
-        <div class="field-row"><div class="field-label">用户账号</div><div class="field-value">{{ ticket.reporter_account or "-" }}</div></div>
-        <div class="field-row"><div class="field-label">用户名称</div><div class="field-value">{{ ticket.reporter_name or "-" }}</div></div>
-        <div class="field-row"><div class="field-label">原始问题</div><div class="field-value" style="white-space:pre-wrap;">{{ ticket.user_query or "-" }}</div></div>
-        <div class="field-row"><div class="field-label">完整地址</div><div class="field-value">{{ ticket.full_address or "-" }}</div></div>
-        <div class="field-row"><div class="field-label">用户期望结果</div><div class="field-value">{{ ticket.expected_result or "-" }}</div></div>
-        <div class="field-row"><div class="field-label">运单号</div><div class="field-value">{{ ticket.waybill_no or "-" }}</div></div>
-    </div>
-
-    <!-- 三、智能体诊断结论 -->
-    <div class="section section-diagnosis">
-        <h2>三、智能体诊断结论</h2>
-        <div class="field-row"><div class="field-label">诊断摘要</div><div class="field-value">{{ ticket.diagnosis_summary or "-" }}</div></div>
-        <div class="field-row"><div class="field-label">内部建议</div><div class="field-value">{{ ticket.internal_suggestion or "-" }}</div></div>
-        <div class="field-row"><div class="field-label">对客答复类型</div><div class="field-value">{{ ticket.customer_reply_type or "-" }}</div></div>
-    </div>
-
-    <!-- 四、诊断上下文 JSON -->
-    {% if ticket.diagnosis_payload %}
-    <div class="section section-json">
-        <h2>四、诊断上下文 JSON</h2>
-        <pre class="json-block">{{ ticket.diagnosis_payload | pretty_json }}</pre>
-    </div>
-    {% endif %}
-
-    <div class="page-group-label">工单处理</div>
-
-    <!-- 操作区域 -->
-    {% if ticket.status != "CLOSED" %}
-    <div id="actions" class="section section-action">
-        <h2>操作</h2>
-        <div class="operator-bar">
-            <div class="operator-title">操作人信息</div>
-            <div class="form-row" style="margin-bottom:0;">
-                <div>
-                    <label>账号</label>
-                    <input id="operatorAccount" type="text" placeholder="选填">
-                </div>
-                <div>
-                    <label>名称</label>
-                    <input id="operatorName" type="text" placeholder="选填">
+<div class="page-layout">
+    <main class="main-col">
+        <div class="card" id="actions">
+            <div class="card-inner">
+                <div class="card-title">批量处理</div>
+                <div class="batch-panel">
+                    <div class="batch-panel-head">
+                        <div class="batch-title">
+                            <small>勾选地址后统一修改状态和回复，处理人：{{ operator.name or "-" }}（{{ operator.account }}）</small>
+                        </div>
+                        <div class="batch-select-actions">
+                            <span class="batch-count" id="selectedCount">已选 0 条</span>
+                            <button type="button" class="btn-mini" onclick="selectAll()">全选当前筛选</button>
+                            <button type="button" class="btn-mini" onclick="deselectAll()">取消全选</button>
+                            <button type="button" class="btn-mini" onclick="selectByStatus('NEW')">选待处理</button>
+                            <button type="button" class="btn-mini" onclick="selectByStatus('PROCESSING')">选处理中</button>
+                        </div>
+                    </div>
+                    <form id="batchForm" method="post" action="{{ request.url_for('batch_update_item_status_form', ticket_no=ticket.ticket_no) }}" onsubmit="return prepareBatchForm(this)">
+                        <input type="hidden" name="item_ids">
+                        <div class="batch-form-grid">
+                            <div class="form-group">
+                                <label>目标状态</label>
+                                <select name="status">
+                                    <option value="RESOLVED">已处理</option>
+                                    <option value="PROCESSING">处理中</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>统一回复描述</label>
+                                <textarea name="reply_desc" placeholder="填写后同步写入所有勾选地址，并用于本次 webhook 回复用户"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary batch-submit-btn">批量保存</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
 
-        <div>
-            <form class="action-box status-action operator-aware-form" method="post" action="{{ request.url_for('update_status_form', ticket_no=ticket.ticket_no) }}" onsubmit="return confirmCloseStatus(this)">
-                <input type="hidden" name="operator_account">
-                <input type="hidden" name="operator_name">
-                <h3>更新状态</h3>
-                <div class="hint">先选择本次处理后的状态，再填写对应说明。保存后会写入处理记录。</div>
-                <div class="status-label-row">
-                    <label>工单状态</label>
-                    <div class="status-inline">
-                        <span>当前</span>
-                        <strong class="status-badge status-{{ ticket.status }}">{{ ticket.status }}</strong>
-                        <span class="arrow">→</span>
-                        <span>保存为</span>
-                        <strong id="targetStatusBadge" class="status-badge status-{{ ticket.status }}">{{ ticket.status }}</strong>
-                    </div>
-                </div>
-                <div class="status-pick-row">
-                    <div>
-                        <select id="statusSelect" name="status">
-                            <option value="NEW" {% if ticket.status == "NEW" %}selected{% endif %}>NEW 新建</option>
-                            <option value="PROCESSING" {% if ticket.status == "PROCESSING" %}selected{% endif %}>PROCESSING 处理中</option>
-                            <option value="RESOLVED" {% if ticket.status == "RESOLVED" %}selected{% endif %}>RESOLVED 已解决</option>
-                            <option value="CLOSED">CLOSED 已关闭</option>
-                        </select>
-                    </div>
-                    <div id="statusHelper" class="status-helper">
-                        <span id="statusHelperText"></span>
-                    </div>
-                </div>
-                <div class="status-comment-row">
-                    <label id="commentLabel">处理说明</label>
-                    <textarea id="statusComment" name="comment"></textarea>
-                    <div id="closeWarning" class="status-warning">关闭后工单将不能继续操作，请确认处理结论已经明确。</div>
-                </div>
-                <div class="action-buttons">
-                    <button type="submit">保存状态</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    {% else %}
-    <div id="actions" class="section section-closed">
-        <div class="closed-summary">
-            <div class="closed-title">工单已关闭</div>
-            {% if ticket.resolved_result and ticket.resolved_result != "状态下拉关闭" %}
-            <div class="closed-result">
-                <div class="closed-result-label">处理结论</div>
-                <div class="closed-result-content">{{ ticket.resolved_result }}</div>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-    {% endif %}
+        <div class="item-list">
+            {% for item in items %}
+            <section class="item-card" data-status="{{ item.status }}" id="item-{{ item.id }}">
+                <div class="item-card-inner">
+                    <div class="item-accent-bar item-accent-{{ item.status }}"></div>
+                    <div class="item-body">
+                        <div class="item-info">
+                            <div class="item-head">
+                                <div class="item-title">
+                                    <input class="item-check" type="checkbox" value="{{ item.id }}">
+                                    <h2>{{ item.item_no }}. {{ item.full_address or item.item_key }}</h2>
+                                </div>
+                                <div class="item-head-right">
+                                    <span class="priority-{{ item.priority }}">{{ item.priority }}</span>
+                                    <span class="status-badge status-{{ item.status }}">{{ item.status | status_text }}</span>
+                                </div>
+                            </div>
+                            <div class="item-fields">
+                                <div class="item-field"><span class="item-field-label">问题描述</span><span class="item-field-value">{{ item.issue_description or "-" }}</span></div>
+                                <div class="item-field"><span class="item-field-label">期望结果</span><span class="item-field-value">{{ item.expected_result or "-" }}</span></div>
+                                <div class="item-field"><span class="item-field-label">问题类型</span><span class="item-field-value">{{ item.issue_type or "-" }}</span></div>
+                                <div class="item-field"><span class="item-field-label">处理人</span><span class="item-field-value">{{ item.operator_name or item.operator_account or "-" }}</span></div>
+                                <div class="item-field"><span class="item-field-label">处理时间</span><span class="item-field-value">{{ item.processed_at.strftime('%Y-%m-%d %H:%M:%S') if item.processed_at else "-" }}</span></div>
+                                <div class="item-field"><span class="item-field-label">运单号</span><span class="item-field-value">{{ item.waybill_no or "-" }}</span></div>
+                            </div>
+                            <button type="button" class="detail-toggle" onclick="toggleDetail(this)"><span class="chevron">⌄</span> 诊断详情</button>
+                        </div>
 
-    <div class="page-group-label">流转记录</div>
+                        <div class="detail-panel">
+                            <div class="detail-inner">
+                                <div class="detail-tabs">
+                                    <button type="button" class="detail-tab is-active" onclick="switchDetailTab(this, 'summary')">诊断摘要</button>
+                                    <button type="button" class="detail-tab" onclick="switchDetailTab(this, 'v5')">V5 接口</button>
+                                    <button type="button" class="detail-tab" onclick="switchDetailTab(this, 'village')">行政村 API</button>
+                                    <button type="button" class="detail-tab" onclick="switchDetailTab(this, 'suggestion')">处理建议</button>
+                                    <button type="button" class="detail-tab" onclick="switchDetailTab(this, 'json')">诊断上下文</button>
+                                </div>
+                                <div class="detail-pane is-active" data-pane="summary">
+                                    <div class="diagnosis-text">{{ item.diagnosis_text or item.diagnosis_summary or "暂无诊断摘要" }}</div>
+                                </div>
+                                <div class="detail-pane" data-pane="v5">
+                                    {% set v5 = item.v5_result or {} %}
+                                    <div class="result-block">
+                                        <h3>顺心 V5 接口结果</h3>
+                                        <div class="mini-row"><div class="mini-label">调用结果</div><div class="mini-value">{{ "成功" if v5.success else "失败/未调用" }}</div></div>
+                                        <div class="mini-row"><div class="mini-label">四级乡镇</div><div class="mini-value">{{ v5.town or "-" }}</div></div>
+                                        <div class="mini-row"><div class="mini-label">五级行政村</div><div class="mini-value">{{ v5.vilName or "-" }}</div></div>
+                                        <div class="mini-row"><div class="mini-label">城市编码</div><div class="mini-value">{{ v5.cityCode or "-" }}</div></div>
+                                        <div class="mini-row"><div class="mini-label">顺心网点</div><div class="mini-value">{{ v5.sxName or "-" }}</div></div>
+                                        <div class="mini-row"><div class="mini-label">网点编码</div><div class="mini-value">{{ v5.sxCode or "-" }}</div></div>
+                                        <div class="mini-row"><div class="mini-label">标准地址</div><div class="mini-value">{{ v5.normalAddress or "-" }}</div></div>
+                                        <div class="mini-row"><div class="mini-label">识别来源</div><div class="mini-value">{{ v5.vilSource or "-" }}</div></div>
+                                    </div>
+                                </div>
+                                <div class="detail-pane" data-pane="village">
+                                    {% set village = item.village_result or {} %}
+                                    <div class="result-block">
+                                        <h3>行政村查询 API 结果</h3>
+                                        <div class="mini-row"><div class="mini-label">调用结果</div><div class="mini-value">{{ "成功" if village.success else "失败/未调用" }}</div></div>
+                                        <div class="mini-row"><div class="mini-label">来源</div><div class="mini-value">{{ village.src or "-" }}</div></div>
+                                        <div class="mini-row"><div class="mini-label">AOI 来源</div><div class="mini-value">{{ village.atAoiSrc or "-" }}</div></div>
+                                        <div class="mini-row"><div class="mini-label">行政村</div><div class="mini-value">{{ village.vilName or "-" }}</div></div>
+                                        <div class="mini-row"><div class="mini-label">网点编码</div><div class="mini-value">{{ village.deptCode or "-" }}</div></div>
+                                        <div class="mini-row"><div class="mini-label">分组编号</div><div class="mini-value">{{ village.groupId or "-" }}</div></div>
+                                        <div class="mini-row"><div class="mini-label">AOI 编号</div><div class="mini-value">{{ village.aoiId or "-" }}</div></div>
+                                        <div class="mini-row"><div class="mini-label">分词结果</div><div class="mini-value">{{ village.splitResult or "-" }}</div></div>
+                                    </div>
+                                </div>
+                                <div class="detail-pane" data-pane="suggestion">
+                                    {% set op = item.operation_suggestion or {} %}
+                                    <div class="result-block">
+                                        <h3>摘要详情及建议</h3>
+                                        <div class="mini-row"><div class="mini-label">识别源</div><div class="mini-value">{{ op.recognitionSource or "-" }}</div></div>
+                                        <div class="mini-row"><div class="mini-label">问题诊断</div><div class="mini-value">{{ op.problemDiagnosis or "-" }}</div></div>
+                                        <div class="mini-row"><div class="mini-label">建议方案</div><div class="mini-value">{{ op.suggestion or "-" }}</div></div>
+                                        <div class="mini-row"><div class="mini-label">处理地址</div><div class="mini-value">{% if op.url %}<a href="{{ op.url }}" target="_blank">{{ op.url }}</a>{% else %}-{% endif %}</div></div>
+                                        <div class="mini-row"><div class="mini-label">注意事项</div><div class="mini-value">{{ op.notice or "-" }}</div></div>
+                                    </div>
+                                </div>
+                                <div class="detail-pane" data-pane="json">
+                                    <pre class="json-block">{{ item.diagnosis_payload | pretty_json }}</pre>
+                                </div>
+                            </div>
+                        </div>
 
-    <div class="section section-events">
-        {% if events %}
-        <ul class="event-list">
-            {% for e in events %}
-            <li class="event-item">
-                <span class="event-type">{{ e.event_type }}</span>
-                <span class="event-time">{{ e.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
-                {% if e.from_status and e.to_status %}
-                <span style="color:#999;font-size:12px;">({{ e.from_status }} &rarr; {{ e.to_status }})</span>
-                {% endif %}
-                <div class="event-content">{{ e.event_content or "" }}</div>
-                {% if e.operator_name %}
-                <div class="event-operator">操作人：{{ e.operator_name }}</div>
-                {% endif %}
-            </li>
+                        <div class="item-action-zone">
+                            <div class="action-zone-head">
+                                <span class="action-zone-title">处理当前地址</span>
+                                <span class="action-zone-hint">仅影响当前地址，不影响其他地址</span>
+                            </div>
+                            <form class="action-form" method="post" action="{{ request.url_for('update_item_status_form', ticket_no=ticket.ticket_no, item_id=item.id) }}">
+                                <div class="action-form-field is-status">
+                                    <label>目标状态</label>
+                                    <select name="status">
+                                        <option value="NEW" {% if item.status == "NEW" %}selected{% endif %}>待处理</option>
+                                        <option value="PROCESSING" {% if item.status == "PROCESSING" %}selected{% endif %}>处理中</option>
+                                        <option value="RESOLVED" {% if item.status in ["RESOLVED", "CLOSED"] %}selected{% endif %}>已处理</option>
+                                    </select>
+                                </div>
+                                <div class="action-form-field">
+                                    <label>回复描述</label>
+                                    <textarea name="reply_desc" rows="1" placeholder="填写当前地址的处理结论，用于回复用户">{{ item.reply_desc or "" }}</textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">保存当前地址</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            {% else %}
+            <div class="card"><div class="empty">暂无地址诊断明细</div></div>
             {% endfor %}
-        </ul>
-        {% else %}
-        <div style="color:#999;text-align:center;padding:20px;">暂无处理记录</div>
-        {% endif %}
-    </div>
+        </div>
 
+        <div class="card" style="margin-top:18px;">
+            <div class="card-inner">
+                <div class="card-title">流转记录</div>
+                {% if events %}
+                <div class="timeline">
+                    {% for e in events %}
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-head">
+                            <span class="timeline-type">{{ e.event_type | event_type_text }}</span>
+                            <span class="timeline-time">{{ e.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                            {% if e.from_status and e.to_status %}
+                            <span class="timeline-status">{{ e.from_status | status_text }} → {{ e.to_status | status_text }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="timeline-content">{{ e.event_content | event_content_text }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty">暂无流转记录</div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    <aside class="side-col">
+        <div class="card">
+            <div class="card-inner">
+                <div class="card-title">工单概览</div>
+                <div class="summary-item"><span class="summary-label">状态</span><span class="summary-value"><span class="status-badge status-{{ ticket.status }}">{{ ticket.status | status_text }}</span></span></div>
+                <div class="summary-item"><span class="summary-label">优先级</span><span class="summary-value"><span class="priority-{{ ticket.priority }}">{{ ticket.priority }}</span></span></div>
+                <div class="summary-item"><span class="summary-label">严重程度</span><span class="summary-value">{{ ticket.severity_type or "-" }}</span></div>
+                <div class="summary-item"><span class="summary-label">来源渠道</span><span class="summary-value">{{ ticket.source_channel }}</span></div>
+                <div class="summary-item"><span class="summary-label">业务类型</span><span class="summary-value">{{ ticket.business_type }}</span></div>
+                <div class="summary-item"><span class="summary-label">反馈群</span><span class="summary-value">{{ ticket.reporter_group or "-" }}</span></div>
+                <div class="summary-item"><span class="summary-label">反馈用户工号</span><span class="summary-value">{{ ticket.reporter_account or ticket.channel_user_id or "-" }}</span></div>
+                <div class="summary-item"><span class="summary-label">明细数量</span><span class="summary-value">{{ items|length }}</span></div>
+                <div class="summary-item"><span class="summary-label">创建时间</span><span class="summary-value">{{ ticket.created_at.strftime('%Y-%m-%d %H:%M') }}</span></div>
+                <div class="summary-item"><span class="summary-label">更新时间</span><span class="summary-value">{{ ticket.updated_at.strftime('%Y-%m-%d %H:%M') }}</span></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-inner">
+                <div class="card-title">地址处理进度</div>
+                <div class="progress-summary">
+                    <div>
+                        <div class="progress-main-number"><span id="countDone">0</span>/<span id="countTotal">{{ items|length }}</span></div>
+                        <div class="progress-main-label">已处理 / 全部地址</div>
+                    </div>
+                    <div class="progress-percent" id="progressPercent">0%</div>
+                </div>
+                <div class="progress-bar-wrap">
+                    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+                    <div class="progress-text" id="progressText">0 / {{ items|length }} 已处理</div>
+                </div>
+                <div class="progress-status-list">
+                    <button type="button" class="progress-status-row is-active" onclick="filterItems('ALL', this)">
+                        <span class="progress-status-label"><span class="progress-dot"></span>全部地址</span>
+                        <span class="progress-count" id="countAll">0</span>
+                    </button>
+                    <button type="button" class="progress-status-row" onclick="filterItems('NEW', this)">
+                        <span class="progress-status-label"><span class="progress-dot NEW"></span>待处理</span>
+                        <span class="progress-count" id="countNEW">0</span>
+                    </button>
+                    <button type="button" class="progress-status-row" onclick="filterItems('PROCESSING', this)">
+                        <span class="progress-status-label"><span class="progress-dot PROCESSING"></span>处理中</span>
+                        <span class="progress-count" id="countPROCESSING">0</span>
+                    </button>
+                    <button type="button" class="progress-status-row" onclick="filterItems('RESOLVED', this)">
+                        <span class="progress-status-label"><span class="progress-dot RESOLVED"></span>已处理</span>
+                        <span class="progress-count" id="countRESOLVED">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </aside>
 </div>
 
 <script>
-const operatorAccount = document.getElementById('operatorAccount');
-const operatorName = document.getElementById('operatorName');
-const statusSelect = document.getElementById('statusSelect');
-const targetStatusBadge = document.getElementById('targetStatusBadge');
-const statusComment = document.getElementById('statusComment');
-const commentLabel = document.getElementById('commentLabel');
-const statusHelperText = document.getElementById('statusHelperText');
-const closeWarning = document.getElementById('closeWarning');
-
-const statusMeta = {
-    NEW: {
-        title: '新建',
-        label: '新建补充说明',
-        placeholder: '例如：补充用户反馈信息、待确认的问题点',
-        helper: '适合记录刚受理后的补充信息，后续可继续切到处理中。',
-    },
-    PROCESSING: {
-        title: '处理中',
-        label: '处理过程',
-        placeholder: '例如：已联系网点核实，等待返回处理结果',
-        helper: '适合记录核查进展、沟通过程、临时结论。',
-    },
-    RESOLVED: {
-        title: '已解决',
-        label: '解决说明',
-        placeholder: '例如：问题已定位并修正，用户期望结果已满足',
-        helper: '适合记录解决方案、结论和对客口径。',
-    },
-    CLOSED: {
-        title: '已关闭',
-        label: '关闭结论',
-        placeholder: '例如：问题已确认解决，关闭工单',
-        helper: '关闭表示本次处理结束，保存后工单将不可继续操作。',
-    },
-};
-
-function updateStatusUi() {
-    if (!statusSelect || !targetStatusBadge) {
-        return;
-    }
-    const value = statusSelect.value;
-    const meta = statusMeta[value] || statusMeta.PROCESSING;
-    targetStatusBadge.textContent = value;
-    targetStatusBadge.className = `status-badge status-${value}`;
-    if (statusComment) statusComment.placeholder = meta.placeholder;
-    if (commentLabel) commentLabel.textContent = meta.label;
-    if (statusHelperText) statusHelperText.textContent = meta.helper;
-    if (closeWarning) closeWarning.classList.toggle('active', value === 'CLOSED');
-}
-
-if (statusSelect) {
-    statusSelect.addEventListener('change', updateStatusUi);
-    updateStatusUi();
-}
-
-if (operatorAccount && operatorName) {
-    operatorAccount.value = localStorage.getItem('ticket_operator_account') || '';
-    operatorName.value = localStorage.getItem('ticket_operator_name') || '';
-
-    document.querySelectorAll('.operator-aware-form').forEach(form => {
-        form.addEventListener('submit', () => {
-            localStorage.setItem('ticket_operator_account', operatorAccount.value.trim());
-            localStorage.setItem('ticket_operator_name', operatorName.value.trim());
-            form.querySelector('input[name="operator_account"]').value = operatorAccount.value.trim();
-            form.querySelector('input[name="operator_name"]').value = operatorName.value.trim();
-        });
-    });
-}
-
-function confirmCloseStatus(form) {
-    const status = form.querySelector('select[name="status"]').value;
-    if (status !== 'CLOSED') {
-        return true;
-    }
-    const comment = form.querySelector('textarea[name="comment"]').value.trim();
-    if (!comment) {
-        alert('关闭工单时请填写处理说明。');
+function prepareBatchForm(form) {
+    const ids = Array.from(document.querySelectorAll('.item-check:checked')).map(item => item.value);
+    if (!ids.length) {
+        alert('请选择至少一条地址');
         return false;
     }
-    return confirm('确认关闭此工单？关闭后将不能继续操作。');
+    form.querySelector('input[name="item_ids"]').value = ids.join(',');
+    return true;
 }
+
+function updateSelectedCount() {
+    const count = document.querySelectorAll('.item-check:checked').length;
+    const target = document.getElementById('selectedCount');
+    if (target) target.textContent = '已选 ' + count + ' 条';
+}
+
+function selectAll() {
+    document.querySelectorAll('.item-card:not(.is-hidden) .item-check').forEach(function(cb) { cb.checked = true; });
+    updateSelectedCount();
+}
+
+function deselectAll() {
+    document.querySelectorAll('.item-check').forEach(function(cb) { cb.checked = false; });
+    updateSelectedCount();
+}
+
+function selectByStatus(status) {
+    deselectAll();
+    document.querySelectorAll('.item-card[data-status="' + status + '"]:not(.is-hidden) .item-check').forEach(function(cb) { cb.checked = true; });
+    updateSelectedCount();
+}
+
+function filterItems(status, button) {
+    document.querySelectorAll('.progress-status-row').forEach(function(tab) { tab.classList.remove('is-active'); });
+    button.classList.add('is-active');
+    document.querySelectorAll('.item-card').forEach(function(card) {
+        const cardStatus = card.getAttribute('data-status');
+        const matched = status === 'ALL' || cardStatus === status || (status === 'RESOLVED' && cardStatus === 'CLOSED');
+        if (matched) {
+            card.classList.remove('is-hidden');
+        } else {
+            card.classList.add('is-hidden');
+        }
+    });
+    updateSelectedCount();
+}
+
+function updateCounts() {
+    const cards = Array.from(document.querySelectorAll('.item-card'));
+    const counts = { NEW: 0, PROCESSING: 0, RESOLVED: 0 };
+    cards.forEach(function(card) {
+        const status = card.getAttribute('data-status');
+        if (status === 'CLOSED') {
+            counts.RESOLVED += 1;
+        } else if (Object.prototype.hasOwnProperty.call(counts, status)) {
+            counts[status] += 1;
+        }
+    });
+    const total = cards.length;
+    const done = counts.RESOLVED;
+    const percent = total ? Math.round(done / total * 100) : 0;
+    document.getElementById('countAll').textContent = total;
+    document.getElementById('countNEW').textContent = counts.NEW;
+    document.getElementById('countPROCESSING').textContent = counts.PROCESSING;
+    document.getElementById('countRESOLVED').textContent = counts.RESOLVED;
+    document.getElementById('countDone').textContent = done;
+    document.getElementById('countTotal').textContent = total;
+    document.getElementById('progressPercent').textContent = percent + '%';
+    document.getElementById('progressFill').style.width = percent + '%';
+    document.getElementById('progressText').textContent = done + ' / ' + total + ' 已处理';
+}
+
+function toggleDetail(button) {
+    const body = button.closest('.item-body');
+    const panel = body.querySelector('.detail-panel');
+    panel.classList.toggle('is-open');
+    button.classList.toggle('is-open');
+}
+
+function switchDetailTab(button, paneName) {
+    const container = button.closest('.detail-inner');
+    container.querySelectorAll('.detail-tab').forEach(function(tab) { tab.classList.remove('is-active'); });
+    container.querySelectorAll('.detail-pane').forEach(function(pane) { pane.classList.remove('is-active'); });
+    button.classList.add('is-active');
+    const target = container.querySelector('[data-pane="' + paneName + '"]');
+    if (target) target.classList.add('is-active');
+}
+
+document.addEventListener('change', function(event) {
+    if (event.target.classList.contains('item-check')) updateSelectedCount();
+});
+
+updateCounts();
+updateSelectedCount();
 </script>
 </body>
 </html>

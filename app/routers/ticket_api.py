@@ -10,16 +10,38 @@ from app.schemas import (
     UpdateStatusRequest,
     AddCommentRequest,
     CloseTicketRequest,
+    UpdateTicketItemRequest,
+    BatchUpdateTicketItemsRequest,
 )
 from app.services.ticket_service import (
     create_ticket,
     update_ticket_status,
     add_comment,
     close_ticket,
+    count_ticket_items,
+    list_ticket_items,
+    update_ticket_item_status,
+    batch_update_ticket_item_status,
 )
-from app.services.notify_service import notify_group
+from app.services.notify_service import notify_group, notify_ticket_items_processed
 
 router = APIRouter(prefix="/api/tickets", tags=["tickets"])
+
+
+def ticket_item_payload(item):
+    return {
+        "id": item.id,
+        "ticketNo": item.ticket_no,
+        "itemKey": item.item_key,
+        "itemNo": item.item_no,
+        "status": item.status,
+        "fullAddress": item.full_address,
+        "issueDescription": item.issue_description,
+        "replyDesc": item.reply_desc,
+        "operatorAccount": item.operator_account,
+        "operatorName": item.operator_name,
+        "processedAt": item.processed_at,
+    }
 
 
 @router.post("", response_model=ApiResponse)
@@ -49,6 +71,7 @@ async def create_ticket_api(req: CreateTicketRequest, db: Session = Depends(get_
                 ticketUrl=ticket.ticket_url,
                 status=ticket.status,
                 duplicated=duplicated,
+                itemCount=count_ticket_items(db, ticket.ticket_no),
             )
         )
 
@@ -122,9 +145,71 @@ def get_ticket_detail(ticket_no: str, db: Session = Depends(get_db)):
         "success": True,
         "data": {
             "ticket": ticket,
+            "items": list_ticket_items(db, ticket_no),
             "events": events,
         }
     }
+
+
+@router.post("/{ticket_no}/items/{item_id}/status")
+async def update_item_status_api(
+    ticket_no: str,
+    item_id: int,
+    req: UpdateTicketItemRequest,
+    db: Session = Depends(get_db),
+):
+    try:
+        item = update_ticket_item_status(
+            db=db,
+            ticket_no=ticket_no,
+            item_id=item_id,
+            status=req.status,
+            reply_desc=req.replyDesc or "",
+            operator_account=req.operatorAccount or "",
+            operator_name=req.operatorName or "",
+        )
+        await notify_ticket_items_processed(
+            db,
+            ticket_no=ticket_no,
+            items=[item],
+            operator_account=req.operatorAccount or "",
+            operator_name=req.operatorName or "",
+            reply_desc=req.replyDesc or "",
+        )
+        return {"success": True, "data": ticket_item_payload(item)}
+    except ValueError as e:
+        status_code = 404 if "not found" in str(e) else 400
+        raise HTTPException(status_code=status_code, detail=str(e))
+
+
+@router.post("/{ticket_no}/items/batch-status")
+async def batch_update_item_status_api(
+    ticket_no: str,
+    req: BatchUpdateTicketItemsRequest,
+    db: Session = Depends(get_db),
+):
+    try:
+        items = batch_update_ticket_item_status(
+            db=db,
+            ticket_no=ticket_no,
+            item_ids=req.itemIds,
+            status=req.status,
+            reply_desc=req.replyDesc or "",
+            operator_account=req.operatorAccount or "",
+            operator_name=req.operatorName or "",
+        )
+        await notify_ticket_items_processed(
+            db,
+            ticket_no=ticket_no,
+            items=items,
+            operator_account=req.operatorAccount or "",
+            operator_name=req.operatorName or "",
+            reply_desc=req.replyDesc or "",
+        )
+        return {"success": True, "data": [ticket_item_payload(item) for item in items]}
+    except ValueError as e:
+        status_code = 404 if "not found" in str(e) else 400
+        raise HTTPException(status_code=status_code, detail=str(e))
 
 
 @router.post("/{ticket_no}/status")

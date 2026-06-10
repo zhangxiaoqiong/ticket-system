@@ -4,11 +4,14 @@ from pydantic import BaseModel
 
 class CreateTicketRequest(BaseModel):
     ticketNo: Optional[str] = None
-    sourceChannel: str
-    businessType: str
+    ticketMode: Optional[str] = None
+    sourceChannel: Optional[str] = None
+    businessType: Optional[str] = None
 
     reporterAccount: Optional[str] = None
     reporterName: Optional[str] = None
+    reporterGroup: Optional[str] = None
+    notifyUserIds: Optional[list[str]] = None
     channelUserId: Optional[str] = None
     sessionId: Optional[str] = None
 
@@ -26,7 +29,34 @@ class CreateTicketRequest(BaseModel):
     customerReplyType: Optional[str] = None
 
     diagnosisPayload: Optional[Dict[str, Any]] = None
+    summary: Optional[str] = None
+    items: Optional[list[Dict[str, Any]]] = None
     idempotentKey: Optional[str] = None
+
+    ticket_payload: Optional[Any] = None
+    ticketPayload: Optional[Any] = None
+    idempotent_key: Optional[str] = None
+    owner_key: Optional[str] = None
+    ticket_type: Optional[str] = None
+    ticket_mode: Optional[str] = None
+    is_batch_ticket: Optional[bool] = None
+    batch_item_count: Optional[int] = None
+    batch_reason: Optional[str] = None
+    batch_severity_type: Optional[str] = None
+    batch_priority: Optional[str] = None
+    batch_diagnosis_summary: Optional[str] = None
+    batch_full_address_text: Optional[str] = None
+    batch_issue_summary_text: Optional[str] = None
+    batch_full_diagnosis_text: Optional[str] = None
+    batch_items: Optional[list[Dict[str, Any]]] = None
+    user_query: Optional[str] = None
+    reporter_account: Optional[str] = None
+    reporter_group: Optional[str] = None
+    channel_user_id: Optional[str] = None
+    session_id: Optional[str] = None
+    severity_type: Optional[str] = None
+    diagnosis_summary: Optional[str] = None
+    customer_reply_type: Optional[str] = None
 
 
 class CreateTicketResponseData(BaseModel):
@@ -34,6 +64,7 @@ class CreateTicketResponseData(BaseModel):
     ticketUrl: str
     status: str
     duplicated: bool
+    itemCount: int = 0
 
 
 class ApiResponse(BaseModel):
@@ -60,3 +91,18 @@ class CloseTicketRequest(BaseModel):
     operatorAccount: Optional[str] = None
     operatorName: Optional[str] = None
     resolvedResult: str
+
+
+class UpdateTicketItemRequest(BaseModel):
+    status: Literal["NEW", "PROCESSING", "RESOLVED", "CLOSED"] = "RESOLVED"
+    replyDesc: Optional[str] = None
+    operatorAccount: Optional[str] = None
+    operatorName: Optional[str] = None
+
+
+class BatchUpdateTicketItemsRequest(BaseModel):
+    itemIds: list[int]
+    status: Literal["NEW", "PROCESSING", "RESOLVED", "CLOSED"] = "RESOLVED"
+    replyDesc: Optional[str] = None
+    operatorAccount: Optional[str] = None
+    operatorName: Optional[str] = None

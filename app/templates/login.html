@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>运营登录 - 顺心分单诊断工单系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { min-height: 100vh; display: grid; place-items: center; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; color: #263238; }
+        .login-box { width: min(420px, calc(100vw - 32px)); background: #fff; border-radius: 8px; box-shadow: 0 8px 30px rgba(15, 23, 42, 0.12); padding: 28px; }
+        h1 { font-size: 20px; margin-bottom: 6px; color: #1f2937; }
+        .subtitle { color: #64748b; font-size: 14px; margin-bottom: 22px; }
+        label { display: block; font-size: 13px; color: #5f6b7a; margin-bottom: 6px; }
+        input { width: 100%; padding: 10px 12px; border: 1px solid #d7dde5; border-radius: 6px; font-size: 14px; margin-bottom: 14px; }
+        input:focus { outline: none; border-color: #1a73e8; box-shadow: 0 0 0 3px rgba(26,115,232,0.12); }
+        button { width: 100%; padding: 10px 16px; background: #1a73e8; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; }
+        button:hover { background: #1557b0; }
+        .error { background: #fff5f5; border: 1px solid #f0b4b4; color: #9f1d1d; border-radius: 6px; padding: 10px 12px; font-size: 13px; margin-bottom: 14px; }
+    </style>
+</head>
+<body>
+    <form class="login-box" method="post" action="{{ request.url_for('operator_login') }}">
+        <h1>运营登录</h1>
+        <div class="subtitle">用于区分地址明细处理人，反馈用户工号仍取自工单。</div>
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+        <input type="hidden" name="next" value="{{ next }}">
+        <label>运营处理人工号</label>
+        <input name="operator_account" type="text" autocomplete="username" placeholder="例如 01416344" autofocus>
+        <label>运营处理人名称</label>
+        <input name="operator_name" type="text" autocomplete="name" placeholder="选填">
+        <button type="submit">登录</button>
+    </form>
+</body>
+</html>

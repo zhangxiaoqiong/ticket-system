@@ -9,7 +9,14 @@ class Settings(BaseSettings):
     database_url: str = "mysql+pymysql://root:password@127.0.0.1:3306/ticket_mvp?charset=utf8mb4"
 
     robot_webhook_url: str = ""
+    robot_webhook_map: str = ""
+    robot_proxy_url: str = ""
     robot_enabled: bool = True
+    robot_processed_notify_enabled: bool = True
+    robot_processed_statuses: str = "RESOLVED,CLOSED"
+    robot_at_mobiles: str = ""
+    robot_at_user_ids: str = ""
+    robot_at_map: str = ""
 
     fs_next_enabled: bool = True
     fs_next_client_id: str = ""

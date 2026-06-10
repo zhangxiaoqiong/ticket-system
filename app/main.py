@@ -1,10 +1,24 @@
 from fastapi import FastAPI
+from sqlalchemy import inspect, text
+
 from app.config import settings
 from app.database import engine
 from app.models import Base
 from app.routers import ticket_api, ticket_pages
 
 Base.metadata.create_all(bind=engine)
+
+
+def ensure_compatible_schema():
+    inspector = inspect(engine)
+    ticket_columns = {column["name"] for column in inspector.get_columns("ticket")}
+    nullable_suffix = "" if engine.dialect.name == "sqlite" else " NULL"
+    with engine.begin() as conn:
+        if "reporter_group" not in ticket_columns:
+            conn.execute(text(f"ALTER TABLE ticket ADD COLUMN reporter_group VARCHAR(256){nullable_suffix}"))
+
+
+ensure_compatible_schema()
 
 app = FastAPI(
     title="顺心分单诊断工单系统 MVP",

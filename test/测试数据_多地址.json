@@ -1,0 +1,896 @@
+{
+  "batch_item_count": 4,
+  "batch_reason": "multiple_addresses",
+  "batch_severity_type": "Type 3",
+  "batch_priority": "P2",
+  "batch_diagnosis_summary": "批量工单：共 4 条地址诊断项，已逐条完成顺心V5接口和行政村查询API诊断。",
+  "batch_full_address_text": "1. 江西省九江市共青城市泽泉乡\n2. 江西省九江市濂溪区高垅乡\n3. 江西省九江市濂溪区赛阳镇\n4. 江西省九江市共青城市苏家垱乡",
+  "batch_issue_summary_text": "1. 地址：江西省九江市共青城市泽泉乡；问题：乡镇匹配错误，不属于网点【SX】九江庐山工业园店\n2. 地址：江西省九江市濂溪区高垅乡；问题：乡镇匹配错误，不属于网点【SX】九江庐山工业园店\n3. 地址：江西省九江市濂溪区赛阳镇；问题：乡镇匹配错误，不属于网点【SX】九江庐山工业园店\n4. 地址：江西省九江市共青城市苏家垱乡；问题：乡镇匹配错误，不属于网点【SX】九江庐山工业园店",
+  "batch_full_diagnosis_text": "【诊断项 1｜addr_001】\n①完整地址文本：江西省九江市共青城市泽泉乡\n\n②问题描述：乡镇匹配错误，不属于网点【SX】九江庐山工业园店\n\n③期望结果：-\n\n④诊断摘要：\n目前顺心V5识别结果：\n- 四级乡镇：泽泉乡\n- 五级行政村：朝阳社区居委会\n- cityCode：792\n\n行政村查询API结果：\n- 行政村：朝阳社区居委会\n- src：AOI\n- atAoiSrc：norm\n- splitResult：江西省^11,九江市^12,共青城市^13,泽泉乡政府^213;13\n- deptCode：792DLD132\n- groupId：4298DDC4C06411E89C756C92BF74D4C8\n- aoiId：F97FC176FB2F4F05AF3901343F658367\n\n⑤摘要详情及建议：\n识别源：AOI识别\n问题诊断：AOI识别中标准库识别错误\n建议方案：在变更管理系统中输入 groupId【4298DDC4C06411E89C756C92BF74D4C8】定位对应记录，将地址更改到正确的位置。\n处理地址：https://gis-cms-bg.sf-express.com/cms/schAoi/schAoiAddressEdit\n注意：更改前后网点不能变更，如果变更需要向对应的补码人员反馈。\n\n【诊断项 2｜addr_002】\n①完整地址文本：江西省九江市濂溪区高垅乡\n\n②问题描述：乡镇匹配错误，不属于网点【SX】九江庐山工业园店\n\n③期望结果：-\n\n④诊断摘要：\n目前顺心V5识别结果：\n- 四级乡镇：高垅乡\n- 五级行政村：高垄社区居委会\n- cityCode：792\n\n行政村查询API结果：\n- 行政村：高垄社区居委会\n- src：AOI\n- atAoiSrc：norm\n- splitResult：江西省^11,九江市^12,濂溪区^13,高垅乡^15,高陇村^213;13\n- deptCode：792DLD056\n- groupId：4F47774EAED211E9A38C40EEDD0EF9F6\n- aoiId：EB9D69E6AA304A34890133BD1E3E96D9\n\n⑤摘要详情及建议：\n识别源：AOI识别\n问题诊断：AOI识别中标准库识别错误\n建议方案：在变更管理系统中输入 groupId【4F47774EAED211E9A38C40EEDD0EF9F6】定位对应记录，将地址更改到正确的位置。\n处理地址：https://gis-cms-bg.sf-express.com/cms/schAoi/schAoiAddressEdit\n注意：更改前后网点不能变更，如果变更需要向对应的补码人员反馈。\n\n【诊断项 3｜addr_003】\n①完整地址文本：江西省九江市濂溪区赛阳镇\n\n②问题描述：乡镇匹配错误，不属于网点【SX】九江庐山工业园店\n\n③期望结果：-\n\n④诊断摘要：\n目前顺心V5识别结果：\n- 四级乡镇：赛阳镇\n- 五级行政村：赛阳村委会\n- cityCode：792\n\n行政村查询API结果：\n- 行政村：-\n- src：GEO\n- atAoiSrc：-\n- splitResult：江西省^11,九江市^12,濂溪区^13,赛阳镇^15;5\n- deptCode：-\n- aoiId：-\n\n⑤摘要详情及建议：\n识别源：GEO识别\n问题诊断：GEO识别落行政村错误\n建议方案：压审补库，将地址更改到正确的位置。\n处理地址：https://gis-ass-op.sf-express.com:1080/tool/addTeamList\n注意：更改前后网点不能变更，如果变更需要向对应的补码人员反馈。\n\n【诊断项 4｜addr_004】\n①完整地址文本：江西省九江市共青城市苏家垱乡\n\n②问题描述：乡镇匹配错误，不属于网点【SX】九江庐山工业园店\n\n③期望结果：-\n\n④诊断摘要：\n目前顺心V5识别结果：\n- 四级乡镇：苏家垱乡\n- 五级行政村：水口村委会\n- cityCode：792\n\n行政村查询API结果：\n- 行政村：水口村委会\n- src：AOI\n- atAoiSrc：norm\n- splitResult：江西省^11,九江市^12,共青城市^13,苏家垱乡政府^213;13\n- deptCode：792D015\n- groupId：417AD672C06411E89C756C92BF74D4C8\n- aoiId：5EE69ED9BA8E4FD1BD727857017DA720\n\n⑤摘要详情及建议：\n识别源：AOI识别\n问题诊断：AOI识别中标准库识别错误\n建议方案：在变更管理系统中输入 groupId【417AD672C06411E89C756C92BF74D4C8】定位对应记录，将地址更改到正确的位置。\n处理地址：https://gis-cms-bg.sf-express.com/cms/schAoi/schAoiAddressEdit\n注意：更改前后网点不能变更，如果变更需要向对应的补码人员反馈。",
+  "batch_items": [
+    {
+      "customerReplyReference": "用户反馈的问题已记录。建议结合诊断结果向用户说明当前初步核查结论，并提示后续将由相关人员继续确认。",
+      "diagnosisPayload": {
+        "apiContext": {
+          "v5Result": {
+            "called": true,
+            "city": "九江市",
+            "cityCode": "792",
+            "county": "共青城市",
+            "errorMessage": "",
+            "normalAdCode": "360482203000",
+            "normalAddress": "江西省九江市共青城市泽泉乡",
+            "normalCityCode": "792",
+            "province": "江西省",
+            "status": "",
+            "success": true,
+            "sxCode": "S792AJC",
+            "sxCodeSource": "",
+            "sxDispThingStatus": 100,
+            "sxName": "【SX】九江共青城新工业园店",
+            "sxOrgMainStatus": 200,
+            "sxOrgStatus": 1,
+            "town": "泽泉乡",
+            "vilName": "朝阳社区居委会",
+            "vilSource": "VIL"
+          },
+          "villageResult": {
+            "aoiCode": "792DLD132000097",
+            "aoiId": "F97FC176FB2F4F05AF3901343F658367",
+            "atAoiSrc": "norm",
+            "called": true,
+            "city": "九江市",
+            "classCode": "210",
+            "className": "乡中心区",
+            "deptCode": "792DLD132",
+            "errorMessage": "",
+            "geoX": "115.8521",
+            "geoY": "29.32017",
+            "groupId": "4298DDC4C06411E89C756C92BF74D4C8",
+            "level": "",
+            "province": "江西省",
+            "splitResult": "江西省^11,九江市^12,共青城市^13,泽泉乡政府^213;13",
+            "src": "AOI",
+            "status": "0",
+            "success": true,
+            "vilName": "朝阳社区居委会"
+          }
+        },
+        "apiRawResponses": {
+          "sxV5Api": {
+            "result": {
+              "areaData": {
+                "adCode": "...",
+                "areaSource": "..."
+              },
+              "normalAdCode": "360482",
+              "normalAddress": "江西省九江市共青城市泽泉乡",
+              "normalCityCode": "792",
+              "sn": "2492602026060818195815478095",
+              "sxData": {
+                "acreage": 42715616,
+                "chName": "...",
+                "code": "..."
+              },
+              "type": "3",
+              "uid": "F97FC176FB2F4F05AF3901343F658367"
+            },
+            "status": 0
+          },
+          "villageApi": {
+            "reqId": "0004062026060818195826397203",
+            "result": {
+              "data": {
+                "aoiCode": "792DLD...",
+                "aoiId": "F97FC1...",
+                "atAoiSrc": "norm",
+                "city": "九江市",
+                "classCode": "210",
+                "county": "共青城市",
+                "deptCode": "792D...",
+                "distance": "0.379",
+                "geoX": "115...",
+                "geoY": "29...",
+                "groupId": "4...",
+                "province": "...",
+                "splitResult": "...",
+                "src": "...",
+                "standardization": "..."
+              },
+              "query": {
+                "address": "江西省九江市共青城市泽泉乡",
+                "cityCode": "792",
+                "sysCode": "BIGDATA"
+              }
+            },
+            "status": 0
+          }
+        },
+        "flowContext": {
+          "processStatus": "pending",
+          "taskType": "diagnose_address_issue"
+        },
+        "flowVersion": "address_diag_v1.0",
+        "itemInput": {
+          "expectedResult": "",
+          "fullAddress": "江西省九江市共青城市泽泉乡",
+          "itemKey": "addr_001",
+          "itemNo": 1,
+          "problemDesc": "乡镇匹配错误，不属于网点【SX】九江庐山工业园店",
+          "problemType": "四级乡镇识别错误",
+          "taskType": "diagnose_address_issue",
+          "userQuery": "江西省九江市共青城市泽泉乡 乡镇匹配错误，不属于网点【SX】九江庐山工业园店",
+          "waybillNo": ""
+        },
+        "operationSop": {
+          "customerReplyReference": "用户反馈的问题已记录。建议结合诊断结果向用户说明当前初步核查结论，并提示后续将由相关人员继续确认。",
+          "operationSuggestion": {
+            "notice": "更改前后网点不能变更，如果变更需要向对应的补码人员反馈。",
+            "problemDiagnosis": "AOI识别中标准库识别错误",
+            "recognitionSource": "AOI识别",
+            "sourceKey": "norm",
+            "suggestion": "在变更管理系统中输入 groupId【4298DDC4C06411E89C756C92BF74D4C8】定位对应记录，将地址更改到正确的位置。",
+            "url": "https://gis-cms-bg.sf-express.com/cms/schAoi/schAoiAddressEdit"
+          }
+        },
+        "parsedFields": {
+          "sxV5Recognition": {
+            "city": "九江市",
+            "cityCode": "792",
+            "county": "共青城市",
+            "province": "江西省",
+            "sxCode": "S792AJC",
+            "sxCodeSource": "",
+            "sxName": "【SX】九江共青城新工业园店",
+            "town": "泽泉乡",
+            "vilName": "朝阳社区居委会",
+            "vilSource": "VIL"
+          },
+          "villageRecognition": {
+            "aoiCode": "792DLD132000097",
+            "aoiId": "F97FC176FB2F4F05AF3901343F658367",
+            "atAoiSrc": "norm",
+            "classCode": "210",
+            "className": "乡中心区",
+            "deptCode": "792DLD132",
+            "errorMessage": "",
+            "groupId": "4298DDC4C06411E89C756C92BF74D4C8",
+            "splitResult": "江西省^11,九江市^12,共青城市^13,泽泉乡政府^213;13",
+            "src": "AOI",
+            "status": "0",
+            "success": true,
+            "vilName": "朝阳社区居委会"
+          }
+        },
+        "ticketItemMode": "batch_item"
+      },
+      "diagnosisSummary": "V5识别结果为四级乡镇【泽泉乡】、五级行政村【朝阳社区居委会】、cityCode【792】；行政村查询API返回src【AOI】、atAoiSrc【norm】；初步判断：AOI识别中标准库识别错误。",
+      "diagnosisText": "①完整地址文本：江西省九江市共青城市泽泉乡\n\n②问题描述：乡镇匹配错误，不属于网点【SX】九江庐山工业园店\n\n③期望结果：-\n\n④诊断摘要：\n目前顺心V5识别结果：\n- 四级乡镇：泽泉乡\n- 五级行政村：朝阳社区居委会\n- cityCode：792\n\n行政村查询API结果：\n- 行政村：朝阳社区居委会\n- src：AOI\n- atAoiSrc：norm\n- splitResult：江西省^11,九江市^12,共青城市^13,泽泉乡政府^213;13\n- deptCode：792DLD132\n- groupId：4298DDC4C06411E89C756C92BF74D4C8\n- aoiId：F97FC176FB2F4F05AF3901343F658367\n\n⑤摘要详情及建议：\n识别源：AOI识别\n问题诊断：AOI识别中标准库识别错误\n建议方案：在变更管理系统中输入 groupId【4298DDC4C06411E89C756C92BF74D4C8】定位对应记录，将地址更改到正确的位置。\n处理地址：https://gis-cms-bg.sf-express.com/cms/schAoi/schAoiAddressEdit\n注意：更改前后网点不能变更，如果变更需要向对应的补码人员反馈。",
+      "expectedResult": "",
+      "fullAddress": "江西省九江市共青城市泽泉乡",
+      "issueDescription": "乡镇匹配错误，不属于网点【SX】九江庐山工业园店",
+      "issueType": "四级乡镇识别错误",
+      "itemKey": "addr_001",
+      "notifyUserIds": [],
+      "operationSuggestion": {
+        "notice": "更改前后网点不能变更，如果变更需要向对应的补码人员反馈。",
+        "problemDiagnosis": "AOI识别中标准库识别错误",
+        "recognitionSource": "AOI识别",
+        "sourceKey": "norm",
+        "suggestion": "在变更管理系统中输入 groupId【4298DDC4C06411E89C756C92BF74D4C8】定位对应记录，将地址更改到正确的位置。",
+        "url": "https://gis-cms-bg.sf-express.com/cms/schAoi/schAoiAddressEdit"
+      },
+      "priority": "P3",
+      "processStatus": "pending",
+      "replyDesc": "",
+      "severityType": "Type 2",
+      "userQuery": "江西省九江市共青城市泽泉乡 乡镇匹配错误，不属于网点【SX】九江庐山工业园店",
+      "v5Result": {
+        "called": true,
+        "city": "九江市",
+        "cityCode": "792",
+        "county": "共青城市",
+        "errorMessage": "",
+        "normalAdCode": "360482203000",
+        "normalAddress": "江西省九江市共青城市泽泉乡",
+        "normalCityCode": "792",
+        "province": "江西省",
+        "status": "",
+        "success": true,
+        "sxCode": "S792AJC",
+        "sxCodeSource": "",
+        "sxDispThingStatus": 100,
+        "sxName": "【SX】九江共青城新工业园店",
+        "sxOrgMainStatus": 200,
+        "sxOrgStatus": 1,
+        "town": "泽泉乡",
+        "vilName": "朝阳社区居委会",
+        "vilSource": "VIL"
+      },
+      "villageResult": {
+        "aoiCode": "792DLD132000097",
+        "aoiId": "F97FC176FB2F4F05AF3901343F658367",
+        "atAoiSrc": "norm",
+        "called": true,
+        "city": "九江市",
+        "classCode": "210",
+        "className": "乡中心区",
+        "deptCode": "792DLD132",
+        "errorMessage": "",
+        "geoX": "115.8521",
+        "geoY": "29.32017",
+        "groupId": "4298DDC4C06411E89C756C92BF74D4C8",
+        "level": "",
+        "province": "江西省",
+        "splitResult": "江西省^11,九江市^12,共青城市^13,泽泉乡政府^213;13",
+        "src": "AOI",
+        "status": "0",
+        "success": true,
+        "vilName": "朝阳社区居委会"
+      },
+      "waybillNo": ""
+    },
+    {
+      "customerReplyReference": "用户反馈的问题已记录。建议结合诊断结果向用户说明当前初步核查结论，并提示后续将由相关人员继续确认。",
+      "diagnosisPayload": {
+        "apiContext": {
+          "v5Result": {
+            "called": true,
+            "city": "九江市",
+            "cityCode": "792",
+            "county": "濂溪区",
+            "errorMessage": "",
+            "normalAdCode": "360402203000",
+            "normalAddress": "江西省九江市濂溪区高垅乡",
+            "normalCityCode": "792",
+            "province": "江西省",
+            "status": "",
+            "success": true,
+            "sxCode": "S792AHN",
+            "sxCodeSource": "",
+            "sxDispThingStatus": 100,
+            "sxName": "【SX】九江浔阳白水湖中路S2店",
+            "sxOrgMainStatus": 200,
+            "sxOrgStatus": 1,
+            "town": "高垅乡",
+            "vilName": "高垄社区居委会",
+            "vilSource": "VIL"
+          },
+          "villageResult": {
+            "aoiCode": "792DLD056000019",
+            "aoiId": "EB9D69E6AA304A34890133BD1E3E96D9",
+            "atAoiSrc": "norm",
+            "called": true,
+            "city": "九江市",
+            "classCode": "210",
+            "className": "乡中心区",
+            "deptCode": "792DLD056",
+            "errorMessage": "",
+            "geoX": "116.074704",
+            "geoY": "29.5951",
+            "groupId": "4F47774EAED211E9A38C40EEDD0EF9F6",
+            "level": "",
+            "province": "江西省",
+            "splitResult": "江西省^11,九江市^12,濂溪区^13,高垅乡^15,高陇村^213;13",
+            "src": "AOI",
+            "status": "0",
+            "success": true,
+            "vilName": "高垄社区居委会"
+          }
+        },
+        "apiRawResponses": {
+          "sxV5Api": {
+            "result": {
+              "areaData": {
+                "adCode": "..."
+              },
+              "normalAdCode": "360402",
+              "normalAddress": "江西省九江市濂溪区高垅乡",
+              "normalCityCode": "792",
+              "sn": "1679732026060818195869970568",
+              "sxData": {
+                "acreage": 31421008,
+                "chName": "...",
+                "code": "..."
+              },
+              "type": "3",
+              "uid": "EB9D69E6AA304A34890133BD1E3E96D9"
+            },
+            "status": 0
+          },
+          "villageApi": {
+            "reqId": "0003902026060818195879194907",
+            "result": {
+              "data": {
+                "aoiCode": "792DLD...",
+                "aoiId": "EB9D6...",
+                "atAoiSrc": "norm",
+                "city": "九江市",
+                "classCode": "210",
+                "county": "濂溪区",
+                "deptCode": "792D...",
+                "distance": "0.65",
+                "geoX": "11...",
+                "geoY": "29...",
+                "groupId": "4...",
+                "province": "...",
+                "splitResult": "...",
+                "src": "...",
+                "standardization": "..."
+              },
+              "query": {
+                "address": "江西省九江市濂溪区高垅乡",
+                "cityCode": "792",
+                "sysCode": "BIGDATA"
+              }
+            },
+            "status": 0
+          }
+        },
+        "flowContext": {
+          "processStatus": "pending",
+          "taskType": "diagnose_address_issue"
+        },
+        "flowVersion": "address_diag_v1.0",
+        "itemInput": {
+          "expectedResult": "",
+          "fullAddress": "江西省九江市濂溪区高垅乡",
+          "itemKey": "addr_002",
+          "itemNo": 2,
+          "problemDesc": "乡镇匹配错误，不属于网点【SX】九江庐山工业园店",
+          "problemType": "四级乡镇识别错误",
+          "taskType": "diagnose_address_issue",
+          "userQuery": "江西省九江市濂溪区高垅乡 乡镇匹配错误，不属于网点【SX】九江庐山工业园店",
+          "waybillNo": ""
+        },
+        "operationSop": {
+          "customerReplyReference": "用户反馈的问题已记录。建议结合诊断结果向用户说明当前初步核查结论，并提示后续将由相关人员继续确认。",
+          "operationSuggestion": {
+            "notice": "更改前后网点不能变更，如果变更需要向对应的补码人员反馈。",
+            "problemDiagnosis": "AOI识别中标准库识别错误",
+            "recognitionSource": "AOI识别",
+            "sourceKey": "norm",
+            "suggestion": "在变更管理系统中输入 groupId【4F47774EAED211E9A38C40EEDD0EF9F6】定位对应记录，将地址更改到正确的位置。",
+            "url": "https://gis-cms-bg.sf-express.com/cms/schAoi/schAoiAddressEdit"
+          }
+        },
+        "parsedFields": {
+          "sxV5Recognition": {
+            "city": "九江市",
+            "cityCode": "792",
+            "county": "濂溪区",
+            "province": "江西省",
+            "sxCode": "S792AHN",
+            "sxCodeSource": "",
+            "sxName": "【SX】九江浔阳白水湖中路S2店",
+            "town": "高垅乡",
+            "vilName": "高垄社区居委会",
+            "vilSource": "VIL"
+          },
+          "villageRecognition": {
+            "aoiCode": "792DLD056000019",
+            "aoiId": "EB9D69E6AA304A34890133BD1E3E96D9",
+            "atAoiSrc": "norm",
+            "classCode": "210",
+            "className": "乡中心区",
+            "deptCode": "792DLD056",
+            "errorMessage": "",
+            "groupId": "4F47774EAED211E9A38C40EEDD0EF9F6",
+            "splitResult": "江西省^11,九江市^12,濂溪区^13,高垅乡^15,高陇村^213;13",
+            "src": "AOI",
+            "status": "0",
+            "success": true,
+            "vilName": "高垄社区居委会"
+          }
+        },
+        "ticketItemMode": "batch_item"
+      },
+      "diagnosisSummary": "V5识别结果为四级乡镇【高垅乡】、五级行政村【高垄社区居委会】、cityCode【792】；行政村查询API返回src【AOI】、atAoiSrc【norm】；初步判断：AOI识别中标准库识别错误。",
+      "diagnosisText": "①完整地址文本：江西省九江市濂溪区高垅乡\n\n②问题描述：乡镇匹配错误，不属于网点【SX】九江庐山工业园店\n\n③期望结果：-\n\n④诊断摘要：\n目前顺心V5识别结果：\n- 四级乡镇：高垅乡\n- 五级行政村：高垄社区居委会\n- cityCode：792\n\n行政村查询API结果：\n- 行政村：高垄社区居委会\n- src：AOI\n- atAoiSrc：norm\n- splitResult：江西省^11,九江市^12,濂溪区^13,高垅乡^15,高陇村^213;13\n- deptCode：792DLD056\n- groupId：4F47774EAED211E9A38C40EEDD0EF9F6\n- aoiId：EB9D69E6AA304A34890133BD1E3E96D9\n\n⑤摘要详情及建议：\n识别源：AOI识别\n问题诊断：AOI识别中标准库识别错误\n建议方案：在变更管理系统中输入 groupId【4F47774EAED211E9A38C40EEDD0EF9F6】定位对应记录，将地址更改到正确的位置。\n处理地址：https://gis-cms-bg.sf-express.com/cms/schAoi/schAoiAddressEdit\n注意：更改前后网点不能变更，如果变更需要向对应的补码人员反馈。",
+      "expectedResult": "",
+      "fullAddress": "江西省九江市濂溪区高垅乡",
+      "issueDescription": "乡镇匹配错误，不属于网点【SX】九江庐山工业园店",
+      "issueType": "四级乡镇识别错误",
+      "itemKey": "addr_002",
+      "notifyUserIds": [],
+      "operationSuggestion": {
+        "notice": "更改前后网点不能变更，如果变更需要向对应的补码人员反馈。",
+        "problemDiagnosis": "AOI识别中标准库识别错误",
+        "recognitionSource": "AOI识别",
+        "sourceKey": "norm",
+        "suggestion": "在变更管理系统中输入 groupId【4F47774EAED211E9A38C40EEDD0EF9F6】定位对应记录，将地址更改到正确的位置。",
+        "url": "https://gis-cms-bg.sf-express.com/cms/schAoi/schAoiAddressEdit"
+      },
+      "priority": "P3",
+      "processStatus": "pending",
+      "replyDesc": "",
+      "severityType": "Type 2",
+      "userQuery": "江西省九江市濂溪区高垅乡 乡镇匹配错误，不属于网点【SX】九江庐山工业园店",
+      "v5Result": {
+        "called": true,
+        "city": "九江市",
+        "cityCode": "792",
+        "county": "濂溪区",
+        "errorMessage": "",
+        "normalAdCode": "360402203000",
+        "normalAddress": "江西省九江市濂溪区高垅乡",
+        "normalCityCode": "792",
+        "province": "江西省",
+        "status": "",
+        "success": true,
+        "sxCode": "S792AHN",
+        "sxCodeSource": "",
+        "sxDispThingStatus": 100,
+        "sxName": "【SX】九江浔阳白水湖中路S2店",
+        "sxOrgMainStatus": 200,
+        "sxOrgStatus": 1,
+        "town": "高垅乡",
+        "vilName": "高垄社区居委会",
+        "vilSource": "VIL"
+      },
+      "villageResult": {
+        "aoiCode": "792DLD056000019",
+        "aoiId": "EB9D69E6AA304A34890133BD1E3E96D9",
+        "atAoiSrc": "norm",
+        "called": true,
+        "city": "九江市",
+        "classCode": "210",
+        "className": "乡中心区",
+        "deptCode": "792DLD056",
+        "errorMessage": "",
+        "geoX": "116.074704",
+        "geoY": "29.5951",
+        "groupId": "4F47774EAED211E9A38C40EEDD0EF9F6",
+        "level": "",
+        "province": "江西省",
+        "splitResult": "江西省^11,九江市^12,濂溪区^13,高垅乡^15,高陇村^213;13",
+        "src": "AOI",
+        "status": "0",
+        "success": true,
+        "vilName": "高垄社区居委会"
+      },
+      "waybillNo": ""
+    },
+    {
+      "customerReplyReference": "用户反馈的问题已记录。建议结合诊断结果向用户说明当前初步核查结论，并提示后续将由相关人员继续确认。",
+      "diagnosisPayload": {
+        "apiContext": {
+          "v5Result": {
+            "called": true,
+            "city": "九江市",
+            "cityCode": "792",
+            "county": "濂溪区",
+            "errorMessage": "",
+            "normalAdCode": "360402",
+            "normalAddress": "江西省九江市濂溪区赛阳镇",
+            "normalCityCode": "792",
+            "province": "江西省",
+            "status": "",
+            "success": true,
+            "sxCode": "S792AHJ",
+            "sxCodeSource": "",
+            "sxDispThingStatus": 100,
+            "sxName": "【SX】九江柴桑工业园店",
+            "sxOrgMainStatus": 200,
+            "sxOrgStatus": 1,
+            "town": "赛阳镇",
+            "vilName": "赛阳村委会",
+            "vilSource": "MODEL"
+          },
+          "villageResult": {
+            "aoiCode": "",
+            "aoiId": "",
+            "atAoiSrc": "",
+            "called": true,
+            "city": "九江市",
+            "classCode": "",
+            "className": "",
+            "deptCode": "",
+            "errorMessage": "",
+            "geoX": "115.93139",
+            "geoY": "29.5763328",
+            "groupId": "",
+            "level": "GL_TOWN",
+            "province": "江西省",
+            "splitResult": "江西省^11,九江市^12,濂溪区^13,赛阳镇^15;5",
+            "src": "GEO",
+            "status": "0",
+            "success": true,
+            "vilName": ""
+          }
+        },
+        "apiRawResponses": {
+          "sxV5Api": {
+            "result": {
+              "areaData": {
+                "adCode": "..."
+              },
+              "normalAdCode": "360402",
+              "normalAddress": "江西省九江市濂溪区赛阳镇",
+              "normalCityCode": "792",
+              "sn": "2197352026060818195922568797",
+              "sxData": {
+                "acreage": 50041868,
+                "chName": "...",
+                "code": "..."
+              },
+              "type": "4",
+              "uid": "AADD5BA3250144978147ECF2C214E394"
+            },
+            "status": 0
+          },
+          "villageApi": {
+            "reqId": "0003382026060818195936097918",
+            "result": {
+              "data": {
+                "city": "九江市",
+                "county": "濂溪区",
+                "filter": 0,
+                "geoX": "115.93139",
+                "geoY": "29.5763328",
+                "level": "GL_TOWN",
+                "province": "江西省",
+                "splitResult": "江西省^11,九江市^12,濂溪区^13,赛阳镇^15;5",
+                "src": "GEO",
+                "town": "赛阳镇",
+                "whiteMark": false
+              },
+              "query": {
+                "address": "江西省九江市濂溪区赛阳镇",
+                "cityCode": "792",
+                "sysCode": "BIGDATA"
+              }
+            },
+            "status": 0
+          }
+        },
+        "flowContext": {
+          "processStatus": "pending",
+          "taskType": "diagnose_address_issue"
+        },
+        "flowVersion": "address_diag_v1.0",
+        "itemInput": {
+          "expectedResult": "",
+          "fullAddress": "江西省九江市濂溪区赛阳镇",
+          "itemKey": "addr_003",
+          "itemNo": 3,
+          "problemDesc": "乡镇匹配错误，不属于网点【SX】九江庐山工业园店",
+          "problemType": "四级乡镇识别错误",
+          "taskType": "diagnose_address_issue",
+          "userQuery": "江西省九江市濂溪区赛阳镇 乡镇匹配错误，不属于网点【SX】九江庐山工业园店",
+          "waybillNo": ""
+        },
+        "operationSop": {
+          "customerReplyReference": "用户反馈的问题已记录。建议结合诊断结果向用户说明当前初步核查结论，并提示后续将由相关人员继续确认。",
+          "operationSuggestion": {
+            "notice": "更改前后网点不能变更，如果变更需要向对应的补码人员反馈。",
+            "problemDiagnosis": "GEO识别落行政村错误",
+            "recognitionSource": "GEO识别",
+            "sourceKey": "geo",
+            "suggestion": "压审补库，将地址更改到正确的位置。",
+            "url": "https://gis-ass-op.sf-express.com:1080/tool/addTeamList"
+          }
+        },
+        "parsedFields": {
+          "sxV5Recognition": {
+            "city": "九江市",
+            "cityCode": "792",
+            "county": "濂溪区",
+            "province": "江西省",
+            "sxCode": "S792AHJ",
+            "sxCodeSource": "",
+            "sxName": "【SX】九江柴桑工业园店",
+            "town": "赛阳镇",
+            "vilName": "赛阳村委会",
+            "vilSource": "MODEL"
+          },
+          "villageRecognition": {
+            "aoiCode": "",
+            "aoiId": "",
+            "atAoiSrc": "",
+            "classCode": "",
+            "className": "",
+            "deptCode": "",
+            "errorMessage": "",
+            "groupId": "",
+            "splitResult": "江西省^11,九江市^12,濂溪区^13,赛阳镇^15;5",
+            "src": "GEO",
+            "status": "0",
+            "success": true,
+            "vilName": ""
+          }
+        },
+        "ticketItemMode": "batch_item"
+      },
+      "diagnosisSummary": "V5识别结果为四级乡镇【赛阳镇】、五级行政村【赛阳村委会】、cityCode【792】；行政村查询API返回src【GEO】、atAoiSrc【-】；初步判断：GEO识别落行政村错误。",
+      "diagnosisText": "①完整地址文本：江西省九江市濂溪区赛阳镇\n\n②问题描述：乡镇匹配错误，不属于网点【SX】九江庐山工业园店\n\n③期望结果：-\n\n④诊断摘要：\n目前顺心V5识别结果：\n- 四级乡镇：赛阳镇\n- 五级行政村：赛阳村委会\n- cityCode：792\n\n行政村查询API结果：\n- 行政村：-\n- src：GEO\n- atAoiSrc：-\n- splitResult：江西省^11,九江市^12,濂溪区^13,赛阳镇^15;5\n- deptCode：-\n- aoiId：-\n\n⑤摘要详情及建议：\n识别源：GEO识别\n问题诊断：GEO识别落行政村错误\n建议方案：压审补库，将地址更改到正确的位置。\n处理地址：https://gis-ass-op.sf-express.com:1080/tool/addTeamList\n注意：更改前后网点不能变更，如果变更需要向对应的补码人员反馈。",
+      "expectedResult": "",
+      "fullAddress": "江西省九江市濂溪区赛阳镇",
+      "issueDescription": "乡镇匹配错误，不属于网点【SX】九江庐山工业园店",
+      "issueType": "四级乡镇识别错误",
+      "itemKey": "addr_003",
+      "notifyUserIds": [],
+      "operationSuggestion": {
+        "notice": "更改前后网点不能变更，如果变更需要向对应的补码人员反馈。",
+        "problemDiagnosis": "GEO识别落行政村错误",
+        "recognitionSource": "GEO识别",
+        "sourceKey": "geo",
+        "suggestion": "压审补库，将地址更改到正确的位置。",
+        "url": "https://gis-ass-op.sf-express.com:1080/tool/addTeamList"
+      },
+      "priority": "P3",
+      "processStatus": "pending",
+      "replyDesc": "",
+      "severityType": "Type 2",
+      "userQuery": "江西省九江市濂溪区赛阳镇 乡镇匹配错误，不属于网点【SX】九江庐山工业园店",
+      "v5Result": {
+        "called": true,
+        "city": "九江市",
+        "cityCode": "792",
+        "county": "濂溪区",
+        "errorMessage": "",
+        "normalAdCode": "360402",
+        "normalAddress": "江西省九江市濂溪区赛阳镇",
+        "normalCityCode": "792",
+        "province": "江西省",
+        "status": "",
+        "success": true,
+        "sxCode": "S792AHJ",
+        "sxCodeSource": "",
+        "sxDispThingStatus": 100,
+        "sxName": "【SX】九江柴桑工业园店",
+        "sxOrgMainStatus": 200,
+        "sxOrgStatus": 1,
+        "town": "赛阳镇",
+        "vilName": "赛阳村委会",
+        "vilSource": "MODEL"
+      },
+      "villageResult": {
+        "aoiCode": "",
+        "aoiId": "",
+        "atAoiSrc": "",
+        "called": true,
+        "city": "九江市",
+        "classCode": "",
+        "className": "",
+        "deptCode": "",
+        "errorMessage": "",
+        "geoX": "115.93139",
+        "geoY": "29.5763328",
+        "groupId": "",
+        "level": "GL_TOWN",
+        "province": "江西省",
+        "splitResult": "江西省^11,九江市^12,濂溪区^13,赛阳镇^15;5",
+        "src": "GEO",
+        "status": "0",
+        "success": true,
+        "vilName": ""
+      },
+      "waybillNo": ""
+    },
+    {
+      "customerReplyReference": "用户反馈的问题已记录。建议结合诊断结果向用户说明当前初步核查结论，并提示后续将由相关人员继续确认。",
+      "diagnosisPayload": {
+        "apiContext": {
+          "v5Result": {
+            "called": true,
+            "city": "九江市",
+            "cityCode": "792",
+            "county": "共青城市",
+            "errorMessage": "",
+            "normalAdCode": "360482204000",
+            "normalAddress": "江西省九江市共青城市苏家垱乡",
+            "normalCityCode": "792",
+            "province": "江西省",
+            "status": "",
+            "success": true,
+            "sxCode": "S792AJC",
+            "sxCodeSource": "",
+            "sxDispThingStatus": 100,
+            "sxName": "【SX】九江共青城新工业园店",
+            "sxOrgMainStatus": 200,
+            "sxOrgStatus": 1,
+            "town": "苏家垱乡",
+            "vilName": "水口村委会",
+            "vilSource": "VIL"
+          },
+          "villageResult": {
+            "aoiCode": "792D015000030",
+            "aoiId": "5EE69ED9BA8E4FD1BD727857017DA720",
+            "atAoiSrc": "norm",
+            "called": true,
+            "city": "九江市",
+            "classCode": "210",
+            "className": "乡中心区",
+            "deptCode": "792D015",
+            "errorMessage": "",
+            "geoX": "115.87733",
+            "geoY": "29.27564",
+            "groupId": "417AD672C06411E89C756C92BF74D4C8",
+            "level": "",
+            "province": "江西省",
+            "splitResult": "江西省^11,九江市^12,共青城市^13,苏家垱乡政府^213;13",
+            "src": "AOI",
+            "status": "0",
+            "success": true,
+            "vilName": "水口村委会"
+          }
+        },
+        "apiRawResponses": {
+          "sxV5Api": {
+            "result": {
+              "areaData": {
+                "adCode": "..."
+              },
+              "normalAdCode": "360482",
+              "normalAddress": "江西省九江市共青城市苏家垱乡",
+              "normalCityCode": "792",
+              "sn": "2180342026060818195963669392",
+              "sxData": {
+                "acreage": 64970344,
+                "chName": "...",
+                "code": "..."
+              },
+              "type": "3",
+              "uid": "5EE69ED9BA8E4FD1BD727857017DA720"
+            },
+            "status": 0
+          },
+          "villageApi": {
+            "reqId": "6604022026060818195974799614",
+            "result": {
+              "data": {
+                "aoiCode": "792D0...",
+                "aoiId": "5EE69...",
+                "atAoiSrc": "norm",
+                "city": "九江市",
+                "classCode": "210",
+                "county": "共青城市",
+                "deptCode": "79...",
+                "distance": "0....",
+                "geoX": "1...",
+                "geoY": "2...",
+                "groupId": "...",
+                "province": "...",
+                "splitResult": "...",
+                "src": "..."
+              },
+              "query": {
+                "address": "江西省九江市共青城市苏家垱乡",
+                "cityCode": "792",
+                "sysCode": "BIGDATA"
+              }
+            },
+            "status": 0
+          }
+        },
+        "flowContext": {
+          "processStatus": "pending",
+          "taskType": "diagnose_address_issue"
+        },
+        "flowVersion": "address_diag_v1.0",
+        "itemInput": {
+          "expectedResult": "",
+          "fullAddress": "江西省九江市共青城市苏家垱乡",
+          "itemKey": "addr_004",
+          "itemNo": 4,
+          "problemDesc": "乡镇匹配错误，不属于网点【SX】九江庐山工业园店",
+          "problemType": "四级乡镇识别错误",
+          "taskType": "diagnose_address_issue",
+          "userQuery": "江西省九江市共青城市苏家垱乡 乡镇匹配错误，不属于网点【SX】九江庐山工业园店",
+          "waybillNo": ""
+        },
+        "operationSop": {
+          "customerReplyReference": "用户反馈的问题已记录。建议结合诊断结果向用户说明当前初步核查结论，并提示后续将由相关人员继续确认。",
+          "operationSuggestion": {
+            "notice": "更改前后网点不能变更，如果变更需要向对应的补码人员反馈。",
+            "problemDiagnosis": "AOI识别中标准库识别错误",
+            "recognitionSource": "AOI识别",
+            "sourceKey": "norm",
+            "suggestion": "在变更管理系统中输入 groupId【417AD672C06411E89C756C92BF74D4C8】定位对应记录，将地址更改到正确的位置。",
+            "url": "https://gis-cms-bg.sf-express.com/cms/schAoi/schAoiAddressEdit"
+          }
+        },
+        "parsedFields": {
+          "sxV5Recognition": {
+            "city": "九江市",
+            "cityCode": "792",
+            "county": "共青城市",
+            "province": "江西省",
+            "sxCode": "S792AJC",
+            "sxCodeSource": "",
+            "sxName": "【SX】九江共青城新工业园店",
+            "town": "苏家垱乡",
+            "vilName": "水口村委会",
+            "vilSource": "VIL"
+          },
+          "villageRecognition": {
+            "aoiCode": "792D015000030",
+            "aoiId": "5EE69ED9BA8E4FD1BD727857017DA720",
+            "atAoiSrc": "norm",
+            "classCode": "210",
+            "className": "乡中心区",
+            "deptCode": "792D015",
+            "errorMessage": "",
+            "groupId": "417AD672C06411E89C756C92BF74D4C8",
+            "splitResult": "江西省^11,九江市^12,共青城市^13,苏家垱乡政府^213;13",
+            "src": "AOI",
+            "status": "0",
+            "success": true,
+            "vilName": "水口村委会"
+          }
+        },
+        "ticketItemMode": "batch_item"
+      },
+      "diagnosisSummary": "V5识别结果为四级乡镇【苏家垱乡】、五级行政村【水口村委会】、cityCode【792】；行政村查询API返回src【AOI】、atAoiSrc【norm】；初步判断：AOI识别中标准库识别错误。",
+      "diagnosisText": "①完整地址文本：江西省九江市共青城市苏家垱乡\n\n②问题描述：乡镇匹配错误，不属于网点【SX】九江庐山工业园店\n\n③期望结果：-\n\n④诊断摘要：\n目前顺心V5识别结果：\n- 四级乡镇：苏家垱乡\n- 五级行政村：水口村委会\n- cityCode：792\n\n行政村查询API结果：\n- 行政村：水口村委会\n- src：AOI\n- atAoiSrc：norm\n- splitResult：江西省^11,九江市^12,共青城市^13,苏家垱乡政府^213;13\n- deptCode：792D015\n- groupId：417AD672C06411E89C756C92BF74D4C8\n- aoiId：5EE69ED9BA8E4FD1BD727857017DA720\n\n⑤摘要详情及建议：\n识别源：AOI识别\n问题诊断：AOI识别中标准库识别错误\n建议方案：在变更管理系统中输入 groupId【417AD672C06411E89C756C92BF74D4C8】定位对应记录，将地址更改到正确的位置。\n处理地址：https://gis-cms-bg.sf-express.com/cms/schAoi/schAoiAddressEdit\n注意：更改前后网点不能变更，如果变更需要向对应的补码人员反馈。",
+      "expectedResult": "",
+      "fullAddress": "江西省九江市共青城市苏家垱乡",
+      "issueDescription": "乡镇匹配错误，不属于网点【SX】九江庐山工业园店",
+      "issueType": "四级乡镇识别错误",
+      "itemKey": "addr_004",
+      "notifyUserIds": [],
+      "operationSuggestion": {
+        "notice": "更改前后网点不能变更，如果变更需要向对应的补码人员反馈。",
+        "problemDiagnosis": "AOI识别中标准库识别错误",
+        "recognitionSource": "AOI识别",
+        "sourceKey": "norm",
+        "suggestion": "在变更管理系统中输入 groupId【417AD672C06411E89C756C92BF74D4C8】定位对应记录，将地址更改到正确的位置。",
+        "url": "https://gis-cms-bg.sf-express.com/cms/schAoi/schAoiAddressEdit"
+      },
+      "priority": "P3",
+      "processStatus": "pending",
+      "replyDesc": "",
+      "severityType": "Type 2",
+      "userQuery": "江西省九江市共青城市苏家垱乡 乡镇匹配错误，不属于网点【SX】九江庐山工业园店",
+      "v5Result": {
+        "called": true,
+        "city": "九江市",
+        "cityCode": "792",
+        "county": "共青城市",
+        "errorMessage": "",
+        "normalAdCode": "360482204000",
+        "normalAddress": "江西省九江市共青城市苏家垱乡",
+        "normalCityCode": "792",
+        "province": "江西省",
+        "status": "",
+        "success": true,
+        "sxCode": "S792AJC",
+        "sxCodeSource": "",
+        "sxDispThingStatus": 100,
+        "sxName": "【SX】九江共青城新工业园店",
+        "sxOrgMainStatus": 200,
+        "sxOrgStatus": 1,
+        "town": "苏家垱乡",
+        "vilName": "水口村委会",
+        "vilSource": "VIL"
+      },
+      "villageResult": {
+        "aoiCode": "792D015000030",
+        "aoiId": "5EE69ED9BA8E4FD1BD727857017DA720",
+        "atAoiSrc": "norm",
+        "called": true,
+        "city": "九江市",
+        "classCode": "210",
+        "className": "乡中心区",
+        "deptCode": "792D015",
+        "errorMessage": "",
+        "geoX": "115.87733",
+        "geoY": "29.27564",
+        "groupId": "417AD672C06411E89C756C92BF74D4C8",
+        "level": "",
+        "province": "江西省",
+        "splitResult": "江西省^11,九江市^12,共青城市^13,苏家垱乡政府^213;13",
+        "src": "AOI",
+        "status": "0",
+        "success": true,
+        "vilName": "水口村委会"
+      },
+      "waybillNo": ""
+    }
+  ],
+  "user_query": "\n江西省九江市共青城市泽泉乡\n江西省九江市濂溪区高垅乡\n江西省九江市濂溪区赛阳镇\n江西省九江市共青城市苏家垱乡\n四个乡镇匹配错误，不属于网点【SX】九江庐山工业园店",
+  "reporter_account": "01416344",
+  "channel_user_id": "01416344",
+  "session_id": "51262675-cb68-4635-ad47-96cd546dbeef"
+}
