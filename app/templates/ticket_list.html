@@ -47,6 +47,8 @@
         .pagination-bar { margin-top: 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
         .page-size-form { display: flex; align-items: center; gap: 8px; color: #666; font-size: 14px; }
         .page-size-form select { padding: 7px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background: #fff; }
+        .page-summary { color: #666; font-size: 14px; }
+        .page-summary strong { color: #333; }
         .pagination { display: flex; justify-content: flex-end; align-items: center; gap: 8px; color: #666; font-size: 14px; }
         .page-link, .page-current { min-width: 34px; height: 34px; padding: 0 10px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; text-decoration: none; }
         .page-link { border: 1px solid #ddd; color: #475569; background: #fff; }
@@ -98,7 +100,7 @@
     </form>
 
     <div class="table-meta">
-        <div>共 <strong>{{ total }}</strong> 条工单，当前第 <strong>{{ page }}</strong> / <strong>{{ total_pages }}</strong> 页</div>
+        <div>共 <strong>{{ total }}</strong> 条工单</div>
         <div>本页 {{ tickets|length }} 条</div>
     </div>
 
@@ -150,6 +152,7 @@
                 <option value="100" {% if page_size==100 %}selected{% endif %}>100 条</option>
             </select>
         </form>
+        <div class="page-summary">当前第 <strong>{{ page }}</strong> / <strong>{{ total_pages }}</strong> 页</div>
         <div class="pagination">
             {% if page > 1 %}
             <a class="page-link" href="{{ request.url_for('ticket_list') }}?page=1{{ query_suffix }}">首页</a>

@@ -308,6 +308,22 @@
         .btn-primary { background: var(--c-primary); color: #fff; }
         .btn-primary:hover { background: var(--c-primary-hover); }
         .action-form .btn-primary { align-self: flex-end; }
+        .notify-option {
+            display: none;
+            align-items: flex-start;
+            gap: 8px;
+            margin-top: 8px;
+            padding: 8px 10px;
+            border: 1px solid #bfdbfe;
+            border-radius: var(--radius-input);
+            background: var(--c-primary-light);
+            color: var(--c-text-secondary);
+            font-size: 12px;
+            line-height: 1.45;
+        }
+        .notify-option.is-visible { display: flex; }
+        .notify-option input { margin-top: 2px; accent-color: var(--c-primary); }
+        .notify-option strong { color: var(--c-text); }
         .btn-mini {
             border: 1px solid var(--c-border);
             border-radius: 6px;
@@ -399,7 +415,7 @@
                         <div class="batch-form-grid">
                             <div class="form-group">
                                 <label>目标状态</label>
-                                <select name="status">
+                                <select name="status" onchange="updateNotifyOption(this.form)">
                                     <option value="RESOLVED">已处理</option>
                                     <option value="PROCESSING">处理中</option>
                                 </select>
@@ -407,6 +423,10 @@
                             <div class="form-group">
                                 <label>统一回复描述</label>
                                 <textarea name="reply_desc" placeholder="填写后同步写入所有勾选地址，并用于本次 webhook 回复用户"></textarea>
+                                <label class="notify-option">
+                                    <input type="checkbox" name="notify_user" value="true" checked>
+                                    <span><strong>通知反馈用户</strong><br>发送处理结果到反馈群，并 @ 反馈问题的人</span>
+                                </label>
                             </div>
                             <button type="submit" class="btn btn-primary batch-submit-btn">批量保存</button>
                         </div>
@@ -440,17 +460,17 @@
                                 <div class="item-field"><span class="item-field-label">处理时间</span><span class="item-field-value">{{ item.processed_at.strftime('%Y-%m-%d %H:%M:%S') if item.processed_at else "-" }}</span></div>
                                 <div class="item-field"><span class="item-field-label">运单号</span><span class="item-field-value">{{ item.waybill_no or "-" }}</span></div>
                             </div>
-                            <button type="button" class="detail-toggle" onclick="toggleDetail(this)"><span class="chevron">⌄</span> 诊断详情</button>
+                            <button type="button" class="detail-toggle{% if items|length == 1 %} is-open{% endif %}" onclick="toggleDetail(this)"><span class="chevron">⌄</span> 诊断详情</button>
                         </div>
 
-                        <div class="detail-panel">
+                        <div class="detail-panel{% if items|length == 1 %} is-open{% endif %}">
                             <div class="detail-inner">
                                 <div class="detail-tabs">
                                     <button type="button" class="detail-tab is-active" onclick="switchDetailTab(this, 'summary')">诊断摘要</button>
                                     <button type="button" class="detail-tab" onclick="switchDetailTab(this, 'v5')">V5 接口</button>
                                     <button type="button" class="detail-tab" onclick="switchDetailTab(this, 'village')">行政村 API</button>
                                     <button type="button" class="detail-tab" onclick="switchDetailTab(this, 'suggestion')">处理建议</button>
-                                    <button type="button" class="detail-tab" onclick="switchDetailTab(this, 'json')">诊断上下文</button>
+                                    <button type="button" class="detail-tab" onclick="switchDetailTab(this, 'json')">接口原始响应</button>
                                 </div>
                                 <div class="detail-pane is-active" data-pane="summary">
                                     <div class="diagnosis-text">{{ item.diagnosis_text or item.diagnosis_summary or "暂无诊断摘要" }}</div>
@@ -495,7 +515,8 @@
                                     </div>
                                 </div>
                                 <div class="detail-pane" data-pane="json">
-                                    <pre class="json-block">{{ item.diagnosis_payload | pretty_json }}</pre>
+                                    {% set raw = (item.diagnosis_payload or {}).get("apiRawResponses") or {} %}
+                                    <pre class="json-block">{{ raw | pretty_json }}</pre>
                                 </div>
                             </div>
                         </div>
@@ -505,10 +526,10 @@
                                 <span class="action-zone-title">处理当前地址</span>
                                 <span class="action-zone-hint">仅影响当前地址，不影响其他地址</span>
                             </div>
-                            <form class="action-form" method="post" action="{{ request.url_for('update_item_status_form', ticket_no=ticket.ticket_no, item_id=item.id) }}">
+                            <form class="action-form" method="post" action="{{ request.url_for('update_item_status_form', ticket_no=ticket.ticket_no, item_id=item.id) }}" onsubmit="return confirmNotifySubmit(this)">
                                 <div class="action-form-field is-status">
                                     <label>目标状态</label>
-                                    <select name="status">
+                                    <select name="status" onchange="updateNotifyOption(this.form)">
                                         <option value="NEW" {% if item.status == "NEW" %}selected{% endif %}>待处理</option>
                                         <option value="PROCESSING" {% if item.status == "PROCESSING" %}selected{% endif %}>处理中</option>
                                         <option value="RESOLVED" {% if item.status in ["RESOLVED", "CLOSED"] %}selected{% endif %}>已处理</option>
@@ -517,6 +538,10 @@
                                 <div class="action-form-field">
                                     <label>回复描述</label>
                                     <textarea name="reply_desc" rows="1" placeholder="填写当前地址的处理结论，用于回复用户">{{ item.reply_desc or "" }}</textarea>
+                                    <label class="notify-option">
+                                        <input type="checkbox" name="notify_user" value="true" {% if item.status not in ["RESOLVED", "CLOSED"] %}checked{% endif %}>
+                                        <span><strong>通知反馈用户</strong><br>发送处理结果到反馈群，并 @ 反馈问题的人</span>
+                                    </label>
                                 </div>
                                 <button type="submit" class="btn btn-primary">保存当前地址</button>
                             </form>
@@ -610,6 +635,9 @@
 </div>
 
 <script>
+const reporterAccount = {{ (ticket.reporter_account or ticket.channel_user_id or "-") | tojson }};
+const reporterGroup = {{ (ticket.reporter_group or "-") | tojson }};
+
 function prepareBatchForm(form) {
     const ids = Array.from(document.querySelectorAll('.item-check:checked')).map(item => item.value);
     if (!ids.length) {
@@ -617,7 +645,41 @@ function prepareBatchForm(form) {
         return false;
     }
     form.querySelector('input[name="item_ids"]').value = ids.join(',');
-    return true;
+    return confirmNotifySubmit(form, ids.length);
+}
+
+function updateNotifyOption(form) {
+    const status = form.querySelector('select[name="status"]')?.value || '';
+    const option = form.querySelector('.notify-option');
+    const checkbox = form.querySelector('input[name="notify_user"]');
+    if (!option || !checkbox) return;
+    const visible = status === 'RESOLVED';
+    option.classList.toggle('is-visible', visible);
+    checkbox.disabled = !visible;
+}
+
+function updateAllNotifyOptions() {
+    document.querySelectorAll('form').forEach(updateNotifyOption);
+}
+
+function confirmNotifySubmit(form, explicitCount) {
+    updateNotifyOption(form);
+    const status = form.querySelector('select[name="status"]')?.value || '';
+    const checkbox = form.querySelector('input[name="notify_user"]');
+    if (status !== 'RESOLVED' || !checkbox || checkbox.disabled || !checkbox.checked) {
+        return true;
+    }
+
+    const reply = (form.querySelector('textarea[name="reply_desc"]')?.value || '').trim() || '-';
+    const itemCount = explicitCount || 1;
+    return confirm([
+        '确认保存为“已处理”并通知反馈用户？',
+        '',
+        '通知范围：' + reporterGroup,
+        '@ 用户：' + reporterAccount,
+        '地址数量：' + itemCount + ' 条',
+        '回复描述：' + reply,
+    ].join('\n'));
 }
 
 function updateSelectedCount() {
@@ -704,6 +766,7 @@ document.addEventListener('change', function(event) {
 
 updateCounts();
 updateSelectedCount();
+updateAllNotifyOptions();
 </script>
 </body>
 </html>

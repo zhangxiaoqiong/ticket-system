@@ -120,6 +120,10 @@ async def parse_form_data(request: Request) -> dict:
     return {key: values[-1] if values else "" for key, values in parsed.items()}
 
 
+def form_bool(value) -> bool:
+    return str(value or "").strip().lower() in {"1", "true", "yes", "on"}
+
+
 @router.get("/login", name="operator_login")
 def operator_login_page(request: Request, next: str | None = None):
     operator = current_operator(request)
@@ -174,7 +178,7 @@ def ticket_list(
     status: str | None = None,
     keyword: str | None = None,
     page: int = 1,
-    page_size: int = 20,
+    page_size: int = 10,
     db: Session = Depends(get_db),
 ):
     operator = operator_or_redirect(request)
@@ -185,7 +189,7 @@ def ticket_list(
     status = (status or "").strip()
     keyword = (keyword or "").strip()
     page = max(page, 1)
-    page_size = page_size if page_size in {10, 20, 50, 100} else 20
+    page_size = page_size if page_size in {10, 20, 50, 100} else 10
 
     if status == "RESOLVED":
         query = query.filter(Ticket.status.in_(["RESOLVED", "CLOSED"]))
@@ -320,14 +324,15 @@ async def update_item_status_form(
             operator_account=operator["account"],
             operator_name=operator["name"],
         )
-        await notify_ticket_items_processed(
-            db,
-            ticket_no=ticket_no,
-            items=[item],
-            operator_account=operator["account"],
-            operator_name=operator["name"],
-            reply_desc=form.get("reply_desc", ""),
-        )
+        if form_bool(form.get("notify_user")):
+            await notify_ticket_items_processed(
+                db,
+                ticket_no=ticket_no,
+                items=[item],
+                operator_account=operator["account"],
+                operator_name=operator["name"],
+                reply_desc=form.get("reply_desc", ""),
+            )
     except ValueError as e:
         status_code = 404 if "not found" in str(e) else 400
         raise HTTPException(status_code=status_code, detail=str(e))
@@ -363,14 +368,15 @@ async def batch_update_item_status_form(
             operator_account=operator["account"],
             operator_name=operator["name"],
         )
-        await notify_ticket_items_processed(
-            db,
-            ticket_no=ticket_no,
-            items=items,
-            operator_account=operator["account"],
-            operator_name=operator["name"],
-            reply_desc=form.get("reply_desc", ""),
-        )
+        if form_bool(form.get("notify_user")):
+            await notify_ticket_items_processed(
+                db,
+                ticket_no=ticket_no,
+                items=items,
+                operator_account=operator["account"],
+                operator_name=operator["name"],
+                reply_desc=form.get("reply_desc", ""),
+            )
     except ValueError as e:
         status_code = 404 if "not found" in str(e) else 400
         raise HTTPException(status_code=status_code, detail=str(e))
