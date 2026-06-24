@@ -54,6 +54,7 @@
         .page-link { border: 1px solid #ddd; color: #475569; background: #fff; }
         .page-link:hover { border-color: #1a73e8; color: #1a73e8; }
         .page-current { background: #1a73e8; color: #fff; font-weight: 700; }
+        .page-ellipsis { min-width: 24px; height: 34px; display: inline-flex; align-items: center; justify-content: center; color: #94a3b8; }
         .page-disabled { min-width: 34px; height: 34px; padding: 0 10px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid #e5e7eb; color: #c0c4cc; background: #f8fafc; }
         @media (max-width: 980px) {
             .filter-bar { grid-template-columns: 1fr 1fr; }
@@ -155,19 +156,25 @@
         <div class="page-summary">当前第 <strong>{{ page }}</strong> / <strong>{{ total_pages }}</strong> 页</div>
         <div class="pagination">
             {% if page > 1 %}
-            <a class="page-link" href="{{ request.url_for('ticket_list') }}?page=1{{ query_suffix }}">首页</a>
             <a class="page-link" href="{{ request.url_for('ticket_list') }}?page={{ page - 1 }}{{ query_suffix }}">上一页</a>
             {% else %}
-            <span class="page-disabled">首页</span>
             <span class="page-disabled">上一页</span>
             {% endif %}
-            <span class="page-current">{{ page }}</span>
+
+            {% for item in page_items %}
+                {% if item == "..." %}
+                <span class="page-ellipsis">...</span>
+                {% elif item == page %}
+                <span class="page-current">{{ item }}</span>
+                {% else %}
+                <a class="page-link" href="{{ request.url_for('ticket_list') }}?page={{ item }}{{ query_suffix }}">{{ item }}</a>
+                {% endif %}
+            {% endfor %}
+
             {% if page < total_pages %}
             <a class="page-link" href="{{ request.url_for('ticket_list') }}?page={{ page + 1 }}{{ query_suffix }}">下一页</a>
-            <a class="page-link" href="{{ request.url_for('ticket_list') }}?page={{ total_pages }}{{ query_suffix }}">末页</a>
             {% else %}
             <span class="page-disabled">下一页</span>
-            <span class="page-disabled">末页</span>
             {% endif %}
         </div>
     </div>

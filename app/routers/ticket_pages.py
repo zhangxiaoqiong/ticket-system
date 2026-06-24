@@ -124,6 +124,24 @@ def form_bool(value) -> bool:
     return str(value or "").strip().lower() in {"1", "true", "yes", "on"}
 
 
+def build_page_items(page: int, total_pages: int, window: int = 2) -> list[int | str]:
+    if total_pages <= 7:
+        return list(range(1, total_pages + 1))
+
+    pages: list[int | str] = [1]
+    start = max(2, page - window)
+    end = min(total_pages - 1, page + window)
+
+    if start > 2:
+        pages.append("...")
+    pages.extend(range(start, end + 1))
+    if end < total_pages - 1:
+        pages.append("...")
+
+    pages.append(total_pages)
+    return pages
+
+
 @router.get("/login", name="operator_login")
 def operator_login_page(request: Request, next: str | None = None):
     operator = current_operator(request)
@@ -211,6 +229,7 @@ def ticket_list(
     total = query.count()
     total_pages = max((total + page_size - 1) // page_size, 1)
     page = min(page, total_pages)
+    page_items = build_page_items(page, total_pages)
     tickets = (
         query.order_by(Ticket.created_at.desc())
         .offset((page - 1) * page_size)
@@ -240,6 +259,7 @@ def ticket_list(
             "page_size": page_size,
             "total": total,
             "total_pages": total_pages,
+            "page_items": page_items,
             "query_suffix": query_suffix,
             "operator": operator,
         }
