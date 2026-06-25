@@ -55,9 +55,9 @@ def event_type_text(value: str) -> str:
         "BOT_ITEMS_PROCESSED_NOTIFIED": "处理结果通知已发送",
         "NOTIFY_FAILED": "机器人通知失败",
         "BOT_ITEMS_PROCESSED_NOTIFY_FAILED": "处理结果通知失败",
-        "FS_NEXT_NOTIFIED": "旧通知已发送",
-        "FS_NEXT_NOTIFY_FAILED": "旧通知失败",
-        "FS_NEXT_NOTIFY_SKIPPED": "旧通知跳过",
+        "FS_NEXT_NOTIFIED": "运营群通知已发送",
+        "FS_NEXT_NOTIFY_FAILED": "运营群通知失败",
+        "FS_NEXT_NOTIFY_SKIPPED": "运营群通知跳过",
     }.get(value or "", value or "-")
 
 
@@ -70,6 +70,9 @@ def event_content_text(value: str) -> str:
         .replace("Ticket status aggregated from address item statuses", "已根据地址明细状态汇总工单状态")
         .replace("Dify diagnosis agent created ticket", "智能诊断助手创建工单")
         .replace("robot message sent", "机器人消息已发送")
+        .replace("fs_next message sent", "运营群通知已发送")
+        .replace("fs_next message failed", "运营群通知失败")
+        .replace("fs_next notification skipped", "运营群通知跳过")
         .replace("response=", "返回=")
         .replace("status=", "状态码=")
     )
