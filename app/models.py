@@ -28,6 +28,7 @@ class Ticket(Base):
     reporter_account = Column(String(128))
     reporter_name = Column(String(128))
     reporter_group = Column(String(256))
+    reporter_group_name = Column(String(256))
     channel_user_id = Column(String(128))
     session_id = Column(String(128))
     owner_key = Column(String(256), nullable=False)

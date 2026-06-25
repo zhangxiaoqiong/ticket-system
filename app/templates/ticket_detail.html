@@ -589,7 +589,7 @@
                 <div class="summary-item"><span class="summary-label">严重程度</span><span class="summary-value">{{ ticket.severity_type or "-" }}</span></div>
                 <div class="summary-item"><span class="summary-label">来源渠道</span><span class="summary-value">{{ ticket.source_channel }}</span></div>
                 <div class="summary-item"><span class="summary-label">业务类型</span><span class="summary-value">{{ ticket.business_type }}</span></div>
-                <div class="summary-item"><span class="summary-label">反馈群</span><span class="summary-value">{{ ticket.reporter_group or "-" }}</span></div>
+                <div class="summary-item"><span class="summary-label">反馈群</span><span class="summary-value" title="{{ ticket.reporter_group or '' }}">{{ ticket.reporter_group_name or ticket.reporter_group or "-" }}</span></div>
                 <div class="summary-item"><span class="summary-label">反馈用户工号</span><span class="summary-value">{{ ticket.reporter_account or ticket.channel_user_id or "-" }}</span></div>
                 <div class="summary-item"><span class="summary-label">明细数量</span><span class="summary-value">{{ items|length }}</span></div>
                 <div class="summary-item"><span class="summary-label">创建时间</span><span class="summary-value">{{ ticket.created_at.strftime('%Y-%m-%d %H:%M') }}</span></div>
@@ -636,7 +636,7 @@
 
 <script>
 const reporterAccount = {{ (ticket.reporter_account or ticket.channel_user_id or "-") | tojson }};
-const reporterGroup = {{ (ticket.reporter_group or "-") | tojson }};
+const reporterGroup = {{ (ticket.reporter_group_name or ticket.reporter_group or "-") | tojson }};
 
 function prepareBatchForm(form) {
     const ids = Array.from(document.querySelectorAll('.item-check:checked')).map(item => item.value);

@@ -129,7 +129,7 @@
                 <td><span class="status-badge status-{{ t.status }}">{{ t.status | status_text }}</span></td>
                 <td><span class="priority-{{ t.priority }}">{{ t.priority }}</span></td>
                 <td>{{ t.issue_type or "-" }}</td>
-                <td class="reporter-group-cell" title="{{ t.reporter_group or '' }}">{{ t.reporter_group or "-" }}</td>
+                <td class="reporter-group-cell" title="{% if t.reporter_group_name and t.reporter_group %}{{ t.reporter_group_name }}（{{ t.reporter_group }}）{% else %}{{ t.reporter_group_name or t.reporter_group or '' }}{% endif %}">{{ t.reporter_group_name or t.reporter_group or "-" }}</td>
                 <td>{{ t.reporter_account or t.channel_user_id or "-" }}</td>
                 <td class="address-cell" title="{{ t.full_address or '' }}">{{ t.full_address or "-" }}</td>
                 <td>{{ t.expected_result or "-" }}</td>

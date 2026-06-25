@@ -222,6 +222,7 @@ def ticket_list(
             | Ticket.user_query.like(like)
             | Ticket.issue_type.like(like)
             | Ticket.reporter_group.like(like)
+            | Ticket.reporter_group_name.like(like)
             | Ticket.reporter_account.like(like)
             | Ticket.channel_user_id.like(like)
         )

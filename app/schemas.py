@@ -11,6 +11,7 @@ class CreateTicketRequest(BaseModel):
     reporterAccount: Optional[str] = None
     reporterName: Optional[str] = None
     reporterGroup: Optional[str] = None
+    reporterGroupName: Optional[str] = None
     notifyUserIds: Optional[list[str]] = None
     channelUserId: Optional[str] = None
     sessionId: Optional[str] = None
@@ -52,6 +53,7 @@ class CreateTicketRequest(BaseModel):
     user_query: Optional[str] = None
     reporter_account: Optional[str] = None
     reporter_group: Optional[str] = None
+    reporter_group_name: Optional[str] = None
     channel_user_id: Optional[str] = None
     session_id: Optional[str] = None
     severity_type: Optional[str] = None

@@ -48,6 +48,7 @@ def ticket_ops_match_keys(ticket: Ticket) -> list[str]:
 def ticket_user_match_keys(ticket: Ticket) -> list[str]:
     return [
         ticket.reporter_group or "",
+        ticket.reporter_group_name or "",
         ticket.reporter_account or "",
         ticket.channel_user_id or "",
         ticket.owner_key or "",
@@ -276,7 +277,7 @@ def address_summary(items: list[TicketItem], max_items: int = 5) -> str:
 def build_robot_message(ticket: Ticket, items: list[TicketItem] | None = None) -> str:
     items = sorted(items or [], key=lambda item: item.item_no or 0)
     reporter = clean_text(ticket.reporter_account or ticket.channel_user_id)
-    reporter_group = clean_text(ticket.reporter_group)
+    reporter_group = clean_text(ticket.reporter_group_name or ticket.reporter_group)
 
     lines = [
         f"【顺心分单诊断工单】{ticket.ticket_no}",
