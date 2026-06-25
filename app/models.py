@@ -26,6 +26,7 @@ class Ticket(Base):
     issue_type = Column(String(128))
 
     reporter_account = Column(String(128))
+    actual_reporter_account = Column(String(128))
     reporter_name = Column(String(128))
     reporter_group = Column(String(256))
     reporter_group_name = Column(String(256))
@@ -62,6 +63,7 @@ Index("idx_status", Ticket.status)
 Index("idx_priority", Ticket.priority)
 Index("idx_created_at", Ticket.created_at)
 Index("idx_reporter_account", Ticket.reporter_account)
+Index("idx_actual_reporter_account", Ticket.actual_reporter_account)
 
 
 class TicketItem(Base):

@@ -16,6 +16,7 @@ from app.services.ticket_service import (
     list_ticket_items,
     update_ticket_item_status,
     batch_update_ticket_item_status,
+    update_ticket_actual_reporter,
 )
 
 router = APIRouter(tags=["pages"])
@@ -49,6 +50,7 @@ def event_type_text(value: str) -> str:
         "STATUS_AGGREGATED": "工单状态汇总",
         "ITEM_STATUS_CHANGED": "地址状态变更",
         "ITEM_STATUS_REMARKED": "地址处理备注",
+        "ACTUAL_REPORTER_UPDATED": "实际反馈用户更新",
         "COMMENT_ADDED": "添加备注",
         "CLOSED": "工单关闭",
         "BOT_NOTIFIED": "机器人通知已发送",
@@ -110,11 +112,21 @@ def operator_or_redirect(request: Request) -> dict[str, str] | RedirectResponse:
     return redirect_to_login(request)
 
 
-def redirect_to_ticket_actions(request: Request, ticket_no: str) -> RedirectResponse:
+def redirect_to_ticket_anchor(
+    request: Request,
+    ticket_no: str,
+    anchor: str,
+    params: dict[str, str] | None = None,
+) -> RedirectResponse:
+    query = f"?{urlencode(params)}" if params else ""
     return RedirectResponse(
-        url=str(request.url_for("ticket_detail", ticket_no=ticket_no)) + "#actions",
+        url=str(request.url_for("ticket_detail", ticket_no=ticket_no)) + query + f"#{anchor}",
         status_code=302,
     )
+
+
+def redirect_to_ticket_actions(request: Request, ticket_no: str) -> RedirectResponse:
+    return redirect_to_ticket_anchor(request, ticket_no, "actions")
 
 
 async def parse_form_data(request: Request) -> dict:
@@ -227,6 +239,7 @@ def ticket_list(
             | Ticket.reporter_group.like(like)
             | Ticket.reporter_group_name.like(like)
             | Ticket.reporter_account.like(like)
+            | Ticket.actual_reporter_account.like(like)
             | Ticket.channel_user_id.like(like)
         )
 
@@ -300,6 +313,35 @@ def ticket_detail(request: Request, ticket_no: str, db: Session = Depends(get_db
         }
     )
 
+@router.post("/tickets/{ticket_no}/actual-reporter-form")
+async def update_actual_reporter_form(
+    request: Request,
+    ticket_no: str,
+    db: Session = Depends(get_db),
+):
+    operator = operator_or_redirect(request)
+    if isinstance(operator, RedirectResponse):
+        return operator
+
+    form = await parse_form_data(request)
+    actual_reporter_account = (form.get("actual_reporter_account", "") or "").strip()
+    try:
+        update_ticket_actual_reporter(
+            db,
+            ticket_no,
+            actual_reporter_account=actual_reporter_account,
+            operator_account=operator["account"],
+            operator_name=operator["name"],
+        )
+    except ValueError as e:
+        status_code = 404 if "not found" in str(e) else 400
+        raise HTTPException(status_code=status_code, detail=str(e))
+    return redirect_to_ticket_anchor(
+        request,
+        ticket_no,
+        "actual-reporter",
+        {"actual_reporter_saved": "1" if actual_reporter_account else "cleared"},
+    )
 
 @router.post("/tickets/{ticket_no}/status-form")
 async def update_status_form(

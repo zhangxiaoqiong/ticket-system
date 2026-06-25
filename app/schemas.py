@@ -9,6 +9,7 @@ class CreateTicketRequest(BaseModel):
     businessType: Optional[str] = None
 
     reporterAccount: Optional[str] = None
+    actualReporterAccount: Optional[str] = None
     reporterName: Optional[str] = None
     reporterGroup: Optional[str] = None
     reporterGroupName: Optional[str] = None
@@ -52,6 +53,7 @@ class CreateTicketRequest(BaseModel):
     batch_items: Optional[list[Dict[str, Any]]] = None
     user_query: Optional[str] = None
     reporter_account: Optional[str] = None
+    actual_reporter_account: Optional[str] = None
     reporter_group: Optional[str] = None
     reporter_group_name: Optional[str] = None
     channel_user_id: Optional[str] = None

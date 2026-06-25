@@ -16,6 +16,8 @@ def ensure_compatible_schema():
     with engine.begin() as conn:
         if "reporter_group" not in ticket_columns:
             conn.execute(text(f"ALTER TABLE ticket ADD COLUMN reporter_group VARCHAR(256){nullable_suffix}"))
+        if "actual_reporter_account" not in ticket_columns:
+            conn.execute(text(f"ALTER TABLE ticket ADD COLUMN actual_reporter_account VARCHAR(128){nullable_suffix}"))
         if "reporter_group_name" not in ticket_columns:
             conn.execute(text(f"ALTER TABLE ticket ADD COLUMN reporter_group_name VARCHAR(256){nullable_suffix}"))
 

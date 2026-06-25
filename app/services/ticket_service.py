@@ -75,6 +75,7 @@ def normalize_create_payload(req: CreateTicketRequest) -> dict[str, Any]:
         ("sourceChannel", ("sourceChannel",)),
         ("businessType", ("businessType",)),
         ("reporterAccount", ("reporterAccount", "reporter_account", "owner_key")),
+        ("actualReporterAccount", ("actualReporterAccount", "actual_reporter_account")),
         ("reporterName", ("reporterName",)),
         ("reporterGroup", ("reporterGroup", "reporter_group")),
         ("reporterGroupName", ("reporterGroupName", "reporter_group_name")),
@@ -272,6 +273,7 @@ def create_ticket(db: Session, req: CreateTicketRequest) -> tuple[Ticket, bool]:
             severity_type=payload.get("severityType") or first_item.get("severityType"),
             issue_type=first_item.get("issueType"),
             reporter_account=payload.get("reporterAccount"),
+            actual_reporter_account=payload.get("actualReporterAccount"),
             reporter_name=payload.get("reporterName"),
             reporter_group=payload.get("reporterGroup"),
             reporter_group_name=payload.get("reporterGroupName"),
@@ -439,6 +441,32 @@ def batch_update_ticket_item_status(
         )
     return updated
 
+
+def update_ticket_actual_reporter(
+    db: Session,
+    ticket_no: str,
+    actual_reporter_account: str = "",
+    operator_account: str = "",
+    operator_name: str = "",
+) -> Ticket:
+    ticket = db.query(Ticket).filter(Ticket.ticket_no == ticket_no).first()
+    if not ticket:
+        raise ValueError("ticket not found")
+
+    old_value = clean(ticket.actual_reporter_account)
+    new_value = clean(actual_reporter_account)
+    ticket.actual_reporter_account = new_value or None
+
+    db.add(TicketEvent(
+        ticket_no=ticket_no,
+        event_type="ACTUAL_REPORTER_UPDATED",
+        operator_account=operator_account,
+        operator_name=operator_name,
+        event_content=f"实际反馈用户从 {old_value or '-'} 改为 {new_value or '-'}",
+    ))
+    db.commit()
+    db.refresh(ticket)
+    return ticket
 
 def update_ticket_status(
     db: Session,

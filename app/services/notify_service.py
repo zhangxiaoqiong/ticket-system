@@ -49,6 +49,7 @@ def ticket_user_match_keys(ticket: Ticket) -> list[str]:
     return [
         ticket.reporter_group or "",
         ticket.reporter_group_name or "",
+        ticket.actual_reporter_account or "",
         ticket.reporter_account or "",
         ticket.channel_user_id or "",
         ticket.owner_key or "",
@@ -88,22 +89,30 @@ def merge_at_targets(*targets: dict[str, list[str]]) -> dict[str, list[str]]:
                     merged[key].append(item)
     return merged
 
+def default_reporter_ids(ticket: Ticket) -> set[str]:
+    return {value for value in [ticket.reporter_account, ticket.channel_user_id] if value}
+
+
+def filter_default_reporter_ids(ticket: Ticket, values: list[str]) -> list[str]:
+    if not ticket.actual_reporter_account:
+        return values
+    defaults = default_reporter_ids(ticket)
+    return [value for value in values if value not in defaults]
 
 def infer_ticket_at_targets(ticket: Ticket) -> dict[str, list[str]]:
     mobiles: list[str] = []
     user_ids: list[str] = []
-    if ticket.reporter_account and MOBILE_PATTERN.match(ticket.reporter_account):
-        mobiles.append(ticket.reporter_account)
-    elif ticket.reporter_account:
-        user_ids.append(ticket.reporter_account)
-    if ticket.channel_user_id and ticket.channel_user_id not in user_ids:
-        user_ids.append(ticket.channel_user_id)
+    primary_account = ticket.actual_reporter_account or ticket.reporter_account or ticket.channel_user_id
+    if primary_account and MOBILE_PATTERN.match(primary_account):
+        mobiles.append(primary_account)
+    elif primary_account:
+        user_ids.append(primary_account)
     return {"atMobiles": mobiles, "atUserIds": user_ids}
 
 
 def resolve_ticket_notify_user_ids(ticket: Ticket) -> list[str]:
     payload = ticket.diagnosis_payload or {}
-    return normalize_values(payload.get("notifyUserIds"))
+    return filter_default_reporter_ids(ticket, normalize_values(payload.get("notifyUserIds")))
 
 
 def resolve_robot_at_targets(ticket: Ticket, items: list[TicketItem] | None = None) -> dict[str, list[str]]:
@@ -118,7 +127,7 @@ def resolve_robot_at_targets(ticket: Ticket, items: list[TicketItem] | None = No
     item_user_ids: list[str] = []
     for item in items or []:
         item_user_ids.extend(normalize_values(item.notify_user_ids))
-    item_targets = {"atMobiles": [], "atUserIds": item_user_ids}
+    item_targets = {"atMobiles": [], "atUserIds": filter_default_reporter_ids(ticket, item_user_ids)}
 
     return merge_at_targets(configured, mapped, payload_targets, item_targets, infer_ticket_at_targets(ticket))
 

@@ -338,6 +338,14 @@
         .summary-item:last-child { border-bottom: none; }
         .summary-label { color: var(--c-text-muted); }
         .summary-value { color: var(--c-text); font-weight: 700; text-align: right; word-break: break-word; }
+        .summary-form-item { display: block; }
+        .actual-reporter-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; margin-top: 7px; }
+        .actual-reporter-form input { min-width: 0; border: 1px solid var(--c-border); border-radius: 6px; padding: 6px 8px; font: inherit; font-size: 12px; }
+        .actual-reporter-form button { border: 1px solid var(--c-primary); border-radius: 6px; background: var(--c-primary); color: #fff; padding: 6px 10px; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+        .actual-reporter-form button:disabled { opacity: .68; cursor: wait; }
+        .summary-note { margin-top: 4px; color: var(--c-text-muted); font-size: 11px; line-height: 1.4; }
+        .summary-note.is-success { color: #166534; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 5px 7px; }
+        .summary-note.is-default { color: #92400e; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 5px 7px; }
         .batch-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
         .batch-header h3 { font-size: 15px; }
         .batch-count { color: var(--c-primary); background: var(--c-primary-light); border-radius: 10px; padding: 2px 8px; font-size: 12px; font-weight: 700; }
@@ -591,6 +599,21 @@
                 <div class="summary-item"><span class="summary-label">业务类型</span><span class="summary-value">{{ ticket.business_type }}</span></div>
                 <div class="summary-item"><span class="summary-label">反馈群</span><span class="summary-value" title="{{ ticket.reporter_group or '' }}">{{ ticket.reporter_group_name or ticket.reporter_group or "-" }}</span></div>
                 <div class="summary-item"><span class="summary-label">反馈用户工号</span><span class="summary-value">{{ ticket.reporter_account or ticket.channel_user_id or "-" }}</span></div>
+                <div class="summary-item summary-form-item" id="actual-reporter">
+                    <span class="summary-label">实际反馈用户工号</span>
+                    <form class="actual-reporter-form" method="post" action="{{ request.url_for('update_actual_reporter_form', ticket_no=ticket.ticket_no) }}">
+                        <input type="text" name="actual_reporter_account" value="{{ ticket.actual_reporter_account or '' }}" placeholder="未填写时默认通知反馈用户">
+                        <button type="submit">保存</button>
+                    </form>
+                    {% set actual_reporter_saved = request.query_params.get('actual_reporter_saved') %}
+                    {% if actual_reporter_saved == "cleared" %}
+                    <div class="summary-note is-default">已恢复默认通知对象：处理完成后 @ 反馈用户工号。</div>
+                    {% elif actual_reporter_saved %}
+                    <div class="summary-note is-success">已启用实际反馈用户：处理完成后优先 @ {{ ticket.actual_reporter_account }}。</div>
+                    {% else %}
+                    <div class="summary-note">处理完成通知优先 @ 此工号；未填写时 @ 反馈用户工号。</div>
+                    {% endif %}
+                </div>
                 <div class="summary-item"><span class="summary-label">明细数量</span><span class="summary-value">{{ items|length }}</span></div>
                 <div class="summary-item"><span class="summary-label">创建时间</span><span class="summary-value">{{ ticket.created_at.strftime('%Y-%m-%d %H:%M') }}</span></div>
                 <div class="summary-item"><span class="summary-label">更新时间</span><span class="summary-value">{{ ticket.updated_at.strftime('%Y-%m-%d %H:%M') }}</span></div>
@@ -635,7 +658,7 @@
 </div>
 
 <script>
-const reporterAccount = {{ (ticket.reporter_account or ticket.channel_user_id or "-") | tojson }};
+const reporterAccount = {{ (ticket.actual_reporter_account or ticket.reporter_account or ticket.channel_user_id or "-") | tojson }};
 const reporterGroup = {{ (ticket.reporter_group_name or ticket.reporter_group or "-") | tojson }};
 
 function prepareBatchForm(form) {
@@ -762,6 +785,15 @@ function switchDetailTab(button, paneName) {
 
 document.addEventListener('change', function(event) {
     if (event.target.classList.contains('item-check')) updateSelectedCount();
+});
+
+document.addEventListener('submit', function(event) {
+    const form = event.target;
+    if (!form.classList.contains('actual-reporter-form')) return;
+    const button = form.querySelector('button[type="submit"]');
+    if (!button) return;
+    button.disabled = true;
+    button.textContent = '保存中';
 });
 
 updateCounts();
